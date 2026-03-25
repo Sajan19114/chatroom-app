@@ -1,342 +1,530 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ChatRoom</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #f1f5f9; margin: 0; height: 100dvh; display: flex; flex-direction: column; }
+    *{box-sizing:border-box;margin:0;padding:0}
+
+    /* Body fills viewport exactly — no scroll on body ever */
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#f1f5f9;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+
+    /* Each screen fills body */
+    .screen{display:none;flex-direction:column;flex:1;height:100dvh;overflow:hidden}
+    .screen.active{display:flex}
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
 
-    /* Chat area */
-    #chat-box { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 6px; }
+    /* Card */
+    .card{background:#1e293b;border-radius:16px;padding:2rem;width:100%;max-width:420px;border:1px solid #334155}
 
-    /* Bubble base */
-    .bubble { max-width: 72%; padding: 9px 14px; border-radius: 18px; font-size: 14.5px; line-height: 1.5; word-break: break-word; position: relative; }
-    .bubble .time { font-size: 11px; opacity: 0.55; margin-top: 3px; display: block; }
-    .bubble .name { font-size: 11px; font-weight: 600; margin-bottom: 2px; opacity: 0.8; }
+    /* Field */
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+    .field input,.field select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:11px 14px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s}
+    .field input:focus,.field select:focus{border-color:#6366f1}
+    .field select option{background:#1e293b}
 
-    /* Mine */
-    .bubble-mine { background: #6366f1; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
-    .bubble-mine .time { text-align: right; }
+    /* Buttons */
+    .btn-primary{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:6px}
+    .btn-primary:hover{background:#818cf8}
+    .btn-ghost{background:none;border:1px solid #334155;border-radius:8px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:all .15s}
+    .btn-ghost:hover{border-color:#6366f1;color:#6366f1}
 
-    /* Theirs */
-    .bubble-theirs { background: #1e293b; color: #e2e8f0; border-bottom-left-radius: 4px; align-self: flex-start; }
+    /* Error */
+    .err{color:#f87171;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#450a0a;border-radius:8px;border:1px solid #7f1d1d}
 
-    /* System */
-    .msg-system { text-align: center; font-size: 12px; color: #64748b; padding: 2px 0; }
+    /* Avatar circle */
+    .avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
 
-    /* Typing */
-    #typing-bar { min-height: 22px; font-size: 12px; color: #94a3b8; padding: 0 1rem 2px; font-style: italic; }
+    /* ── CHAT SCREEN LAYOUT ────────────────────────────
+       Header: flex-shrink:0 — locked, never scrolls
+       #chat-box: flex:1; overflow-y:auto; min-height:0 — only this scrolls
+       Bottom bar: flex-shrink:0 — locked, never scrolls
+    ─────────────────────────────────────────────── */
+    #chat-header{background:#0f172a;border-bottom:1px solid #1e293b;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:10}
+    #chat-box{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:6px;min-height:0}
+    #chat-bottom{flex-shrink:0;background:#0f172a;border-top:1px solid #1e293b}
+    #typing-bar{min-height:18px;font-size:12px;color:#94a3b8;padding:4px 1rem 0;font-style:italic}
+    #input-row{padding:8px 12px 14px;display:flex;gap:8px;align-items:flex-end}
 
-    /* Input area */
-    #input-area { padding: 10px 12px 14px; background: #0f172a; border-top: 1px solid #1e293b; display: flex; gap: 8px; align-items: flex-end; }
-    #msg-input { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 22px; padding: 10px 16px; color: #f1f5f9; font-size: 14px; outline: none; resize: none; max-height: 120px; line-height: 1.4; }
-    #msg-input:focus { border-color: #6366f1; }
-    #send-btn { background: #6366f1; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
-    #send-btn:hover { background: #818cf8; }
-    #send-btn svg { width: 18px; height: 18px; fill: white; }
+    /* Bubbles */
+    .bubble{max-width:72%;padding:9px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
+    .bubble .btime{font-size:11px;opacity:.5;margin-top:3px;display:block}
+    .bubble .bname{font-size:11px;font-weight:600;margin-bottom:2px;opacity:.8;display:block}
+    .bubble-mine{background:#6366f1;color:#fff;border-bottom-right-radius:4px}
+    .bubble-theirs{background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px}
+    .msg-system{text-align:center;font-size:12px;color:#475569;padding:3px 0}
 
-    /* Header */
-    #chat-header { background: #0f172a; border-bottom: 1px solid #1e293b; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
-    #room-info { font-size: 13px; color: #94a3b8; }
-    #room-name-display { font-weight: 700; font-size: 16px; color: #f1f5f9; }
-    #online-badge { background: #10b981; width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    /* Input */
+    #msg-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:22px;padding:10px 16px;color:#f1f5f9;font-size:14px;outline:none;resize:none;max-height:120px;line-height:1.4}
+    #msg-input:focus{border-color:#6366f1}
+    #send-btn{background:#6366f1;border:none;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+    #send-btn:hover{background:#818cf8}
 
-    /* Join screen */
-    #join-screen { position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 10; }
-    .join-card { background: #1e293b; border-radius: 16px; padding: 2rem; width: 100%; max-width: 400px; border: 1px solid #334155; }
-    .join-card h1 { font-size: 24px; font-weight: 700; margin: 0 0 6px; color: #f1f5f9; }
-    .join-card p { font-size: 14px; color: #94a3b8; margin: 0 0 24px; }
-    .field-group { margin-bottom: 16px; }
-    .field-group label { display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .field-group input { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 11px 14px; color: #f1f5f9; font-size: 15px; outline: none; transition: border 0.2s; }
-    .field-group input:focus { border-color: #6366f1; }
-    .join-btn { width: 100%; background: #6366f1; color: white; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.15s; }
-    .join-btn:hover { background: #818cf8; }
-    .error-msg { color: #f87171; font-size: 13px; margin-top: 8px; display: none; }
+    /* Users dropdown — anchored to header */
+    #users-panel{position:absolute;top:calc(100% + 4px);right:12px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px;min-width:190px;z-index:50;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+    #users-panel.open{display:block}
 
-    /* Users panel */
-    #users-panel { position: absolute; top: 56px; right: 0; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; min-width: 180px; z-index: 5; display: none; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-    #users-panel.open { display: block; }
-    #users-panel h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin: 0 0 8px; }
-    .user-item { font-size: 13px; padding: 4px 0; color: #e2e8f0; display: flex; align-items: center; gap: 6px; }
-    .user-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; flex-shrink: 0; }
+    /* Profile overlay */
+    #profile-panel{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+    #profile-panel.open{display:flex}
+
+    /* Room chips */
+    .room-chip{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:border .15s}
+    .room-chip:hover{border-color:#6366f1}
+
+    /* Tabs */
+    .tab{padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s;flex:1;text-align:center}
+    .tab.active{background:#1e293b;color:#f1f5f9}
   </style>
 </head>
 <body>
 
-<!-- JOIN SCREEN -->
-<div id="join-screen">
-  <div class="join-card">
-    <h1>💬 ChatRoom</h1>
-    <p>Enter a room name to start chatting. Share the room name with friends to chat together.</p>
+<!-- ══════ SCREEN 1 — AUTH ══════ -->
+<div id="screen-auth" class="screen active" style="align-items:center;justify-content:center;padding:1rem;overflow-y:auto">
+  <div class="card">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:36px;margin-bottom:6px">💬</div>
+      <h1 style="font-size:22px;font-weight:700">ChatRoom</h1>
+      <p style="color:#64748b;font-size:14px;margin-top:4px">Connect instantly with anyone</p>
+    </div>
 
-    <div class="field-group">
-      <label>Your name</label>
-      <input id="input-username" type="text" placeholder="e.g. Alex" maxlength="24" autocomplete="off" />
+    <div style="display:flex;gap:4px;background:#0f172a;border-radius:10px;padding:4px;margin-bottom:20px">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')">Register</button>
     </div>
-    <div class="field-group">
-      <label>Room name</label>
-      <input id="input-room" type="text" placeholder="e.g. team-standup or private-123" maxlength="40" autocomplete="off" />
+
+    <!-- Login -->
+    <div id="form-login">
+      <div class="field"><label>Mobile Number</label><input id="l-mobile" type="tel" placeholder="10-digit number" maxlength="10"/></div>
+      <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Your password"/></div>
+      <div class="err" id="l-err"></div>
+      <button class="btn-primary" onclick="doLogin()">Login →</button>
+      <p style="text-align:center;font-size:13px;color:#64748b;margin-top:14px">No account? <span style="color:#818cf8;cursor:pointer" onclick="switchTab('register')">Register</span></p>
     </div>
-    <div id="join-error" class="error-msg">Please enter both a name and a room.</div>
-    <button class="join-btn" onclick="joinRoom()">Join Room →</button>
+
+    <!-- Register -->
+    <div id="form-register" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field" style="margin:0"><label>Full Name</label><input id="r-name" type="text" placeholder="Your name" maxlength="40"/></div>
+        <div class="field" style="margin:0"><label>Mobile</label><input id="r-mobile" type="tel" placeholder="10 digits" maxlength="10"/></div>
+      </div>
+      <div style="height:10px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field" style="margin:0"><label>Age</label><input id="r-age" type="number" placeholder="Age" min="10" max="120"/></div>
+        <div class="field" style="margin:0"><label>Gender</label>
+          <select id="r-gender"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 characters"/></div>
+      <div class="err" id="r-err"></div>
+      <button class="btn-primary" onclick="doRegister()">Create Account →</button>
+      <p style="text-align:center;font-size:13px;color:#64748b;margin-top:14px">Have account? <span style="color:#818cf8;cursor:pointer" onclick="switchTab('login')">Login</span></p>
+    </div>
   </div>
 </div>
 
-<!-- CHAT UI (hidden until joined) -->
-<div id="chat-ui" style="display:none; flex-direction:column; flex:1; position:relative;">
-
-  <!-- Header -->
-  <div id="chat-header">
-    <div>
-      <div id="room-name-display"></div>
-      <div id="room-info"><span id="online-badge"></span><span id="user-count">1</span> online</div>
+<!-- ══════ SCREEN 2 — ROOMS ══════ -->
+<div id="screen-rooms" class="screen">
+  <!-- Locked header -->
+  <div style="background:#0f172a;border-bottom:1px solid #1e293b;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="hdr-avatar" class="avatar" style="width:36px;height:36px;font-size:13px"></div>
+      <div>
+        <div id="hdr-name" style="font-weight:600;font-size:15px"></div>
+        <div style="font-size:12px;color:#64748b">Tap a room to join</div>
+      </div>
     </div>
-    <button onclick="toggleUsers()" style="background:none;border:1px solid #334155;border-radius:8px;padding:6px 12px;color:#94a3b8;cursor:pointer;font-size:13px;">
-      👥 Users
-    </button>
-    <!-- Users dropdown -->
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" onclick="openProfile()">👤 Profile</button>
+      <button class="btn-ghost" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <!-- Scrollable content -->
+  <div style="flex:1;overflow-y:auto;padding:1.25rem;min-height:0">
+    <div style="max-width:600px;width:100%;margin:0 auto">
+      <div style="background:#1e293b;border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;border:1px solid #334155">
+        <h2 style="font-size:16px;font-weight:600;margin-bottom:12px">Join a Room</h2>
+        <div style="display:flex;gap:8px">
+          <input id="new-room-input" type="text" placeholder="Enter room name…" maxlength="40"
+            style="flex:1;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none"
+            onkeydown="if(event.key==='Enter')joinRoomByName()"/>
+          <button onclick="joinRoomByName()" style="background:#6366f1;border:none;border-radius:10px;padding:10px 18px;color:#fff;font-weight:600;cursor:pointer;font-size:14px">Join</button>
+        </div>
+        <p style="font-size:12px;color:#475569;margin-top:8px">Share this name with friends to chat together</p>
+      </div>
+      <div id="recent-rooms-section" style="display:none">
+        <h2 style="font-size:14px;font-weight:600;color:#64748b;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Recent Rooms</h2>
+        <div id="recent-rooms-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN 3 — CHAT ══════ -->
+<div id="screen-chat" class="screen">
+
+  <!-- LOCKED header -->
+  <div id="chat-header">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="leaveRoom()" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:22px;line-height:1;padding:0 6px 2px">‹</button>
+      <div>
+        <div id="chat-room-name" style="font-weight:700;font-size:15px"></div>
+        <div id="chat-online" style="font-size:12px;color:#10b981"></div>
+      </div>
+    </div>
+    <button class="btn-ghost" onclick="toggleUsers()">👥 <span id="chat-user-count">0</span> online</button>
+
+    <!-- Users dropdown — inside header so it positions correctly -->
     <div id="users-panel">
-      <h3>In this room</h3>
-      <div id="users-list"></div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#475569;margin-bottom:8px;font-weight:600">In this room</div>
+      <div id="users-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
   </div>
 
-  <!-- Messages -->
+  <!-- ONLY THIS SCROLLS -->
   <div id="chat-box"></div>
 
-  <!-- Typing indicator -->
-  <div id="typing-bar"></div>
-
-  <!-- Input -->
-  <div id="input-area">
-    <textarea id="msg-input" rows="1" placeholder="Type a message…" maxlength="2000"></textarea>
-    <button id="send-btn" onclick="sendMessage()">
-      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-    </button>
+  <!-- LOCKED bottom bar -->
+  <div id="chat-bottom">
+    <div id="typing-bar"></div>
+    <div id="input-row">
+      <textarea id="msg-input" rows="1" placeholder="Type a message…" maxlength="2000"></textarea>
+      <button id="send-btn" onclick="sendMessage()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
   </div>
 
+</div>
+
+<!-- Profile panel (fixed overlay, works from any screen) -->
+<div id="profile-panel">
+  <div class="card" style="max-width:380px;position:relative">
+    <button onclick="closeProfile()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button>
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div id="profile-avatar" class="avatar" style="width:64px;height:64px;font-size:22px;margin:0 auto 10px"></div>
+      <div id="profile-name-display" style="font-size:18px;font-weight:700"></div>
+      <div id="profile-mobile-display" style="font-size:13px;color:#64748b"></div>
+    </div>
+    <div class="field"><label>Full Name</label><input id="p-name" type="text" maxlength="40"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field" style="margin:0"><label>Age</label><input id="p-age" type="number" min="10" max="120"/></div>
+      <div class="field" style="margin:0"><label>Gender</label>
+        <select id="p-gender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+      </div>
+    </div>
+    <div class="err" id="p-err"></div>
+    <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+  </div>
 </div>
 
 <script>
-  let socket;
-  let myUsername = "";
-  let myRoomId = "";
-  let typingTimer = null;
-  let isTyping = false;
-  const typingUsers = new Set();
+// ══ STATE ══
+let currentUser = null;
+let socket = null;
+let currentRoom = null;
+let typingTimer = null;
+let isTyping = false;
+const typingUsers = new Set();
 
-  // ── Join ─────────────────────────────────────────────────────────────────
-  function joinRoom() {
-    const username = document.getElementById("input-username").value.trim();
-    const roomId = document.getElementById("input-room").value.trim();
-    const errEl = document.getElementById("join-error");
-
-    if (!username || !roomId) {
-      errEl.style.display = "block";
-      return;
+// ══ AUTO-LOGIN ══
+(async () => {
+  try {
+    const res = await fetch("/api/me");
+    if (res.ok) {
+      const { user } = await res.json();
+      currentUser = user;
+      showRoomsScreen();
     }
-    errEl.style.display = "none";
+  } catch {}
+})();
 
-    myUsername = username;
-    myRoomId = roomId;
+// ══ SCREENS ══
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
-    // Auto-detect server URL (works locally and on Render)
-    const serverUrl = window.location.origin;
-    socket = io(serverUrl);
+function showRoomsScreen() {
+  showScreen("screen-rooms");
+  document.getElementById("hdr-name").textContent = currentUser.name;
+  setAvatar("hdr-avatar", currentUser.initials, currentUser.avatarColor, 36);
+  loadRecentRooms();
+  connectSocket();
+}
 
-    socket.on("connect", () => {
-      socket.emit("join_room", { roomId, username });
-      document.getElementById("join-screen").style.display = "none";
-      const chatUi = document.getElementById("chat-ui");
-      chatUi.style.display = "flex";
-      document.getElementById("room-name-display").textContent = `# ${roomId}`;
-      document.getElementById("msg-input").focus();
-    });
+function showChatScreen(roomId) {
+  currentRoom = roomId;
+  showScreen("screen-chat");
+  document.getElementById("chat-room-name").textContent = "# " + roomId;
+  document.getElementById("msg-input").focus();
+}
 
-    socket.on("chat_history", (messages) => {
-      const box = document.getElementById("chat-box");
-      box.innerHTML = "";
-      if (messages.length > 0) {
-        appendSystem("— Chat history (last 24h) —");
-        messages.forEach(renderMessage);
-        appendSystem("— Live —");
-      }
-      scrollBottom();
-    });
+// ══ AUTH ══
+function switchTab(tab) {
+  document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("form-register").style.display = tab === "register" ? "block" : "none";
+  document.getElementById("tab-login").classList.toggle("active", tab === "login");
+  document.getElementById("tab-register").classList.toggle("active", tab === "register");
+}
 
-    socket.on("new_message", (msg) => {
-      renderMessage(msg);
-      scrollBottom();
-    });
+async function doRegister() {
+  const body = { name: v("r-name"), mobile: v("r-mobile"), password: v("r-pass"), age: v("r-age"), gender: v("r-gender") };
+  if (!body.name || !body.mobile || !body.password || !body.age || !body.gender)
+    return showErr("r-err", "Please fill in all fields");
+  try {
+    const res = await fetch("/api/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) return showErr("r-err", data.error);
+    currentUser = data.user;
+    showRoomsScreen();
+  } catch { showErr("r-err", "Network error, try again"); }
+}
 
-    socket.on("room_update", ({ userCount, users }) => {
-      document.getElementById("user-count").textContent = userCount;
-      const list = document.getElementById("users-list");
-      list.innerHTML = users.map(u =>
-        `<div class="user-item"><span class="user-dot"></span>${escHtml(u)}</div>`
-      ).join("");
-    });
+async function doLogin() {
+  const body = { mobile: v("l-mobile"), password: v("l-pass") };
+  if (!body.mobile || !body.password) return showErr("l-err", "Enter mobile and password");
+  try {
+    const res = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) return showErr("l-err", data.error);
+    currentUser = data.user;
+    showRoomsScreen();
+  } catch { showErr("l-err", "Network error, try again"); }
+}
 
-    socket.on("user_typing", ({ username }) => {
-      typingUsers.add(username);
-      updateTypingBar();
-    });
+async function doLogout() {
+  await fetch("/api/logout", { method:"POST" });
+  socket?.disconnect();
+  socket = null; currentUser = null; currentRoom = null;
+  showScreen("screen-auth");
+}
 
-    socket.on("user_stop_typing", ({ username }) => {
-      typingUsers.delete(username);
-      updateTypingBar();
-    });
+// ══ ROOMS ══
+async function loadRecentRooms() {
+  try {
+    const res = await fetch("/api/rooms");
+    const { rooms } = await res.json();
+    const section = document.getElementById("recent-rooms-section");
+    const list = document.getElementById("recent-rooms-list");
+    if (!rooms || rooms.length === 0) { section.style.display = "none"; return; }
+    section.style.display = "block";
+    list.innerHTML = rooms.slice().reverse().slice(0, 8).map(r => `
+      <div class="room-chip" onclick="enterRoom('${esc(r)}')">
+        <div style="width:34px;height:34px;background:#6366f1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px">💬</div>
+        <div>
+          <div style="font-weight:600;font-size:14px">${esc(r)}</div>
+          <div style="font-size:12px;color:#64748b">Tap to rejoin</div>
+        </div>
+      </div>`).join("");
+  } catch {}
+}
 
-    socket.on("disconnect", () => {
-      appendSystem("Disconnected. Trying to reconnect…");
-    });
+function joinRoomByName() {
+  const name = document.getElementById("new-room-input").value.trim();
+  if (!name) return;
+  enterRoom(name);
+}
 
-    socket.on("connect_error", () => {
-      appendSystem("Connection error. Please refresh.");
-    });
-  }
+function enterRoom(roomId) {
+  showChatScreen(roomId);
+  document.getElementById("chat-box").innerHTML = "";
+  socket.emit("join_room", { roomId });
+}
 
-  // ── Send ──────────────────────────────────────────────────────────────────
-  function sendMessage() {
-    const input = document.getElementById("msg-input");
-    const text = input.value.trim();
-    if (!text || !socket) return;
+function leaveRoom() {
+  currentRoom = null;
+  document.getElementById("chat-box").innerHTML = "";
+  showScreen("screen-rooms");
+  loadRecentRooms();
+}
 
-    socket.emit("send_message", { roomId: myRoomId, text });
-    input.value = "";
+// ══ SOCKET ══
+function connectSocket() {
+  if (socket?.connected) return;
+  socket = io(window.location.origin, { auth: { token: getCookie("token") } });
+  socket.on("connect", () => console.log("Socket connected"));
+  socket.on("connect_error", err => console.error("Socket error:", err.message));
+
+  socket.on("chat_history", (messages) => {
+    const box = document.getElementById("chat-box");
+    box.innerHTML = "";
+    if (messages.length > 0) {
+      appendSystem("— Chat history —");
+      messages.forEach(renderMessage);
+      appendSystem("— Live —");
+    }
+    scrollBottom();
+  });
+
+  socket.on("new_message", (msg) => { renderMessage(msg); scrollBottom(); });
+
+  socket.on("room_update", ({ userCount, users }) => {
+    document.getElementById("chat-user-count").textContent = userCount;
+    document.getElementById("chat-online").textContent = userCount + " online";
+    document.getElementById("users-list").innerHTML = users.map(u => `
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <div class="avatar" style="width:26px;height:26px;font-size:10px;background:${u.avatarColor}">${esc(u.initials)}</div>
+        <span>${esc(u.name)}</span>
+      </div>`).join("");
+  });
+
+  socket.on("user_typing", ({ username }) => { typingUsers.add(username); updateTypingBar(); });
+  socket.on("user_stop_typing", ({ username }) => { typingUsers.delete(username); updateTypingBar(); });
+}
+
+// ══ MESSAGING ══
+function sendMessage() {
+  const input = document.getElementById("msg-input");
+  const text = input.value.trim();
+  if (!text || !socket || !currentRoom) return;
+  socket.emit("send_message", { roomId: currentRoom, text });
+  input.value = "";
+  input.style.height = "auto";
+  stopTyping();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("msg-input");
+  input.addEventListener("input", () => {
     input.style.height = "auto";
-    stopTyping();
-  }
-
-  // ── Typing ────────────────────────────────────────────────────────────────
-  document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("msg-input");
-
-    input.addEventListener("input", () => {
-      // Auto-resize
-      input.style.height = "auto";
-      input.style.height = Math.min(input.scrollHeight, 120) + "px";
-
-      // Typing indicator
-      if (!isTyping) {
-        isTyping = true;
-        socket?.emit("typing_start", { roomId: myRoomId });
-      }
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(stopTyping, 1500);
-    });
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    // Allow Enter to submit on join screen
-    document.getElementById("input-room").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") joinRoom();
-    });
-    document.getElementById("input-username").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") joinRoom();
-    });
+    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+    if (!isTyping) { isTyping = true; socket?.emit("typing_start", { roomId: currentRoom }); }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(stopTyping, 1500);
   });
-
-  function stopTyping() {
-    if (isTyping) {
-      isTyping = false;
-      socket?.emit("typing_stop", { roomId: myRoomId });
-    }
-  }
-
-  function updateTypingBar() {
-    const bar = document.getElementById("typing-bar");
-    const others = [...typingUsers].filter(u => u !== myUsername);
-    if (others.length === 0) { bar.textContent = ""; return; }
-    if (others.length === 1) { bar.textContent = `${others[0]} is typing…`; return; }
-    if (others.length === 2) { bar.textContent = `${others[0]} and ${others[1]} are typing…`; return; }
-    bar.textContent = `Several people are typing…`;
-  }
-
-  // ── Render ────────────────────────────────────────────────────────────────
-  function renderMessage(msg) {
-    if (msg.type === "system") {
-      appendSystem(msg.text);
-      return;
-    }
-    const box = document.getElementById("chat-box");
-    const isMine = msg.username === myUsername;
-    const div = document.createElement("div");
-    div.style.display = "flex";
-    div.style.flexDirection = "column";
-    div.style.alignItems = isMine ? "flex-end" : "flex-start";
-
-    const bubble = document.createElement("div");
-    bubble.className = `bubble ${isMine ? "bubble-mine" : "bubble-theirs"}`;
-
-    if (!isMine) {
-      const name = document.createElement("span");
-      name.className = "name";
-      name.textContent = msg.username;
-      bubble.appendChild(name);
-    }
-
-    const text = document.createElement("span");
-    text.textContent = msg.text;
-    bubble.appendChild(text);
-
-    const time = document.createElement("span");
-    time.className = "time";
-    time.textContent = formatTime(msg.timestamp);
-    bubble.appendChild(time);
-
-    div.appendChild(bubble);
-    box.appendChild(div);
-  }
-
-  function appendSystem(text) {
-    const box = document.getElementById("chat-box");
-    const div = document.createElement("div");
-    div.className = "msg-system";
-    div.textContent = text;
-    box.appendChild(div);
-  }
-
-  function scrollBottom() {
-    const box = document.getElementById("chat-box");
-    box.scrollTop = box.scrollHeight;
-  }
-
-  // ── Utils ─────────────────────────────────────────────────────────────────
-  function formatTime(ts) {
-    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  }
-
-  function escHtml(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
-
-  function toggleUsers() {
-    document.getElementById("users-panel").classList.toggle("open");
-  }
-
-  // Close users panel on outside click
-  document.addEventListener("click", (e) => {
-    const panel = document.getElementById("users-panel");
-    if (!panel.contains(e.target) && !e.target.closest("button[onclick='toggleUsers()']")) {
-      panel.classList.remove("open");
-    }
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   });
+});
+
+function stopTyping() {
+  if (isTyping) { isTyping = false; socket?.emit("typing_stop", { roomId: currentRoom }); }
+}
+
+function updateTypingBar() {
+  const bar = document.getElementById("typing-bar");
+  const others = [...typingUsers].filter(u => u !== currentUser?.name);
+  if (!others.length) { bar.textContent = ""; return; }
+  bar.textContent = others.length === 1 ? `${others[0]} is typing…` : `${others.length} people are typing…`;
+}
+
+// ══ RENDER MESSAGES ══
+function renderMessage(msg) {
+  if (msg.type === "system") { appendSystem(msg.text); return; }
+  const box = document.getElementById("chat-box");
+  const isMine = msg.username === currentUser?.name;
+
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText = `display:flex;align-items:flex-end;gap:7px;${isMine ? "flex-direction:row-reverse" : ""}`;
+
+  // Avatar — always show initials from first letter of username
+  const av = document.createElement("div");
+  av.className = "avatar";
+  av.style.cssText = `width:30px;height:30px;font-size:11px;background:${msg.avatarColor || "#6366f1"};flex-shrink:0`;
+  // Use first letter of name as fallback if initials missing
+  av.textContent = (msg.initials || msg.username || "?").charAt(0).toUpperCase();
+  wrapper.appendChild(av);
+
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${isMine ? "bubble-mine" : "bubble-theirs"}`;
+  if (!isMine) {
+    const nameEl = document.createElement("span");
+    nameEl.className = "bname";
+    nameEl.textContent = msg.username;
+    bubble.appendChild(nameEl);
+  }
+  const textEl = document.createElement("span");
+  textEl.textContent = msg.text;
+  bubble.appendChild(textEl);
+  const timeEl = document.createElement("span");
+  timeEl.className = "btime";
+  timeEl.textContent = formatTime(msg.timestamp);
+  bubble.appendChild(timeEl);
+
+  wrapper.appendChild(bubble);
+  box.appendChild(wrapper);
+}
+
+function appendSystem(text) {
+  const box = document.getElementById("chat-box");
+  const d = document.createElement("div");
+  d.className = "msg-system";
+  d.textContent = text;
+  box.appendChild(d);
+}
+
+function scrollBottom() {
+  const box = document.getElementById("chat-box");
+  box.scrollTop = box.scrollHeight;
+}
+
+// ══ PROFILE ══
+function openProfile() {
+  document.getElementById("p-name").value = currentUser.name;
+  document.getElementById("p-age").value = currentUser.age;
+  document.getElementById("p-gender").value = currentUser.gender;
+  document.getElementById("profile-name-display").textContent = currentUser.name;
+  document.getElementById("profile-mobile-display").textContent = "📱 " + currentUser.mobile;
+  setAvatar("profile-avatar", currentUser.initials, currentUser.avatarColor, 64);
+  document.getElementById("profile-panel").classList.add("open");
+}
+
+function closeProfile() { document.getElementById("profile-panel").classList.remove("open"); }
+
+async function saveProfile() {
+  const body = { name: v("p-name"), age: v("p-age"), gender: v("p-gender") };
+  if (!body.name || !body.age || !body.gender) return showErr("p-err", "All fields required");
+  try {
+    const res = await fetch("/api/profile", { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) return showErr("p-err", data.error);
+    currentUser = data.user;
+    setAvatar("hdr-avatar", currentUser.initials, currentUser.avatarColor, 36);
+    document.getElementById("hdr-name").textContent = currentUser.name;
+    closeProfile();
+  } catch { showErr("p-err", "Save failed"); }
+}
+
+// ══ UTILS ══
+function v(id) { return document.getElementById(id)?.value?.trim() || ""; }
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function formatTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); }
+function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = "block"; }
+
+// setAvatar — always uses first letter of name as fallback
+function setAvatar(id, initials, color, size) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const letter = (initials || "?").charAt(0).toUpperCase();
+  el.textContent = letter;
+  el.style.background = color || "#6366f1";
+  if (size) {
+    el.style.width = size + "px";
+    el.style.height = size + "px";
+    el.style.fontSize = Math.round(size * 0.38) + "px";
+  }
+}
+
+function getCookie(name) {
+  return document.cookie.split(";").find(c => c.trim().startsWith(name + "="))?.split("=")[1] || "";
+}
+
+function toggleUsers() { document.getElementById("users-panel").classList.toggle("open"); }
+
+document.addEventListener("click", e => {
+  const panel = document.getElementById("users-panel");
+  if (!e.target.closest("#users-panel") && !e.target.closest(".btn-ghost"))
+    panel?.classList.remove("open");
+});
 </script>
 </body>
 </html>
