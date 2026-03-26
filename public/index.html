@@ -8,80 +8,69 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-
-    /* Body fills viewport exactly — no scroll on body ever */
     body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#f1f5f9;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
-
-    /* Each screen fills body */
     .screen{display:none;flex-direction:column;flex:1;height:100dvh;overflow:hidden}
     .screen.active{display:flex}
-
-    /* Scrollbar */
-    ::-webkit-scrollbar{width:4px}
-    ::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
-
-    /* Card */
-    .card{background:#1e293b;border-radius:16px;padding:2rem;width:100%;max-width:420px;border:1px solid #334155}
-
-    /* Field */
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
+    .card{background:#1e293b;border-radius:16px;padding:2rem;width:100%;max-width:440px;border:1px solid #334155}
     .field{margin-bottom:14px}
     .field label{display:block;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
     .field input,.field select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:11px 14px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s}
     .field input:focus,.field select:focus{border-color:#6366f1}
     .field select option{background:#1e293b}
-
-    /* Buttons */
-    .btn-primary{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:6px}
+    .btn-primary{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:6px}
     .btn-primary:hover{background:#818cf8}
-    .btn-ghost{background:none;border:1px solid #334155;border-radius:8px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:all .15s}
+    .btn-danger{width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:6px}
+    .btn-danger:hover{background:#ef4444}
+    .btn-ghost{background:none;border:1px solid #334155;border-radius:8px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:all .15s;white-space:nowrap}
     .btn-ghost:hover{border-color:#6366f1;color:#6366f1}
-
-    /* Error */
     .err{color:#f87171;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#450a0a;border-radius:8px;border:1px solid #7f1d1d}
-
-    /* Avatar circle */
     .avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
-
-    /* ── CHAT SCREEN LAYOUT ────────────────────────────
-       Header: flex-shrink:0 — locked, never scrolls
-       #chat-box: flex:1; overflow-y:auto; min-height:0 — only this scrolls
-       Bottom bar: flex-shrink:0 — locked, never scrolls
-    ─────────────────────────────────────────────── */
+    /* Chat layout */
     #chat-header{background:#0f172a;border-bottom:1px solid #1e293b;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:10}
     #chat-box{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:6px;min-height:0}
     #chat-bottom{flex-shrink:0;background:#0f172a;border-top:1px solid #1e293b}
     #typing-bar{min-height:18px;font-size:12px;color:#94a3b8;padding:4px 1rem 0;font-style:italic}
     #input-row{padding:8px 12px 14px;display:flex;gap:8px;align-items:flex-end}
-
     /* Bubbles */
-    .bubble{max-width:72%;padding:9px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word}
+    .bubble-wrap{display:flex;align-items:flex-end;gap:7px}
+    .bubble{max-width:72%;padding:9px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;position:relative;cursor:pointer;user-select:none}
     .bubble .btime{font-size:11px;opacity:.5;margin-top:3px;display:block}
     .bubble .bname{font-size:11px;font-weight:600;margin-bottom:2px;opacity:.8;display:block}
     .bubble-mine{background:#6366f1;color:#fff;border-bottom-right-radius:4px}
     .bubble-theirs{background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px}
+    .bubble.pinned-bubble{border:2px solid #f59e0b}
     .msg-system{text-align:center;font-size:12px;color:#475569;padding:3px 0}
-
     /* Input */
     #msg-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:22px;padding:10px 16px;color:#f1f5f9;font-size:14px;outline:none;resize:none;max-height:120px;line-height:1.4}
     #msg-input:focus{border-color:#6366f1}
     #send-btn{background:#6366f1;border:none;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
     #send-btn:hover{background:#818cf8}
-
-    /* Users dropdown — anchored to header */
-    #users-panel{position:absolute;top:calc(100% + 4px);right:12px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px;min-width:190px;z-index:50;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+    /* Pinned bar */
+    #pinned-bar{background:#1e293b;border-bottom:1px solid #334155;padding:8px 14px;display:none;align-items:center;gap:8px;flex-shrink:0}
+    #pinned-bar.visible{display:flex}
+    /* Panels */
+    #users-panel{position:absolute;top:calc(100% + 4px);right:12px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px;min-width:200px;z-index:50;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6);max-height:300px;overflow-y:auto}
     #users-panel.open{display:block}
-
-    /* Profile overlay */
-    #profile-panel{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
-    #profile-panel.open{display:flex}
-
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+    .overlay.open{display:flex}
     /* Room chips */
-    .room-chip{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:border .15s}
+    .room-chip{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border .15s}
     .room-chip:hover{border-color:#6366f1}
-
     /* Tabs */
-    .tab{padding:8px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s;flex:1;text-align:center}
+    .tab{padding:8px 0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s;flex:1;text-align:center}
     .tab.active{background:#1e293b;color:#f1f5f9}
+    /* Context menu */
+    #ctx-menu{position:fixed;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);min-width:160px}
+    #ctx-menu.open{display:block}
+    .ctx-item{padding:9px 14px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:8px;transition:background .1s}
+    .ctx-item:hover{background:#334155}
+    .ctx-item.danger{color:#f87171}
+    .ctx-item.danger:hover{background:#450a0a}
+    /* Room code badge */
+    .code-badge{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:4px;color:#818cf8;text-align:center}
+    /* Confirm dialog */
+    .confirm-card{background:#1e293b;border-radius:16px;padding:1.5rem;width:100%;max-width:340px;border:1px solid #334155;text-align:center}
   </style>
 </head>
 <body>
@@ -92,15 +81,12 @@
     <div style="text-align:center;margin-bottom:1.5rem">
       <div style="font-size:36px;margin-bottom:6px">💬</div>
       <h1 style="font-size:22px;font-weight:700">ChatRoom</h1>
-      <p style="color:#64748b;font-size:14px;margin-top:4px">Connect instantly with anyone</p>
+      <p style="color:#64748b;font-size:14px;margin-top:4px">Secure rooms. Real conversations.</p>
     </div>
-
     <div style="display:flex;gap:4px;background:#0f172a;border-radius:10px;padding:4px;margin-bottom:20px">
       <button class="tab active" id="tab-login" onclick="switchTab('login')">Login</button>
       <button class="tab" id="tab-register" onclick="switchTab('register')">Register</button>
     </div>
-
-    <!-- Login -->
     <div id="form-login">
       <div class="field"><label>Mobile Number</label><input id="l-mobile" type="tel" placeholder="10-digit number" maxlength="10"/></div>
       <div class="field"><label>Password</label><input id="l-pass" type="password" placeholder="Your password"/></div>
@@ -108,8 +94,6 @@
       <button class="btn-primary" onclick="doLogin()">Login →</button>
       <p style="text-align:center;font-size:13px;color:#64748b;margin-top:14px">No account? <span style="color:#818cf8;cursor:pointer" onclick="switchTab('register')">Register</span></p>
     </div>
-
-    <!-- Register -->
     <div id="form-register" style="display:none">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="field" style="margin:0"><label>Full Name</label><input id="r-name" type="text" placeholder="Your name" maxlength="40"/></div>
@@ -133,36 +117,37 @@
 
 <!-- ══════ SCREEN 2 — ROOMS ══════ -->
 <div id="screen-rooms" class="screen">
-  <!-- Locked header -->
   <div style="background:#0f172a;border-bottom:1px solid #1e293b;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
     <div style="display:flex;align-items:center;gap:10px">
       <div id="hdr-avatar" class="avatar" style="width:36px;height:36px;font-size:13px"></div>
       <div>
         <div id="hdr-name" style="font-weight:600;font-size:15px"></div>
-        <div style="font-size:12px;color:#64748b">Tap a room to join</div>
+        <div style="font-size:12px;color:#64748b">Your rooms</div>
       </div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn-ghost" onclick="openProfile()">👤 Profile</button>
+      <button class="btn-ghost" onclick="openProfile()">👤</button>
       <button class="btn-ghost" onclick="doLogout()">Logout</button>
     </div>
   </div>
-  <!-- Scrollable content -->
   <div style="flex:1;overflow-y:auto;padding:1.25rem;min-height:0">
     <div style="max-width:600px;width:100%;margin:0 auto">
-      <div style="background:#1e293b;border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;border:1px solid #334155">
-        <h2 style="font-size:16px;font-weight:600;margin-bottom:12px">Join a Room</h2>
-        <div style="display:flex;gap:8px">
-          <input id="new-room-input" type="text" placeholder="Enter room name…" maxlength="40"
-            style="flex:1;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none"
-            onkeydown="if(event.key==='Enter')joinRoomByName()"/>
-          <button onclick="joinRoomByName()" style="background:#6366f1;border:none;border-radius:10px;padding:10px 18px;color:#fff;font-weight:600;cursor:pointer;font-size:14px">Join</button>
-        </div>
-        <p style="font-size:12px;color:#475569;margin-top:8px">Share this name with friends to chat together</p>
+      <!-- Actions -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem">
+        <button onclick="openCreateRoom()" style="background:#6366f1;border:none;border-radius:12px;padding:14px;color:#fff;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+          ➕ Create Room
+        </button>
+        <button onclick="openJoinRoom()" style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#f1f5f9;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+          🔑 Join Room
+        </button>
       </div>
-      <div id="recent-rooms-section" style="display:none">
-        <h2 style="font-size:14px;font-weight:600;color:#64748b;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Recent Rooms</h2>
-        <div id="recent-rooms-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <!-- Room list -->
+      <div id="rooms-loading" style="text-align:center;color:#475569;padding:2rem;font-size:14px">Loading rooms…</div>
+      <div id="rooms-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div id="rooms-empty" style="display:none;text-align:center;padding:3rem 1rem">
+        <div style="font-size:40px;margin-bottom:12px">🏠</div>
+        <div style="font-weight:600;margin-bottom:6px">No rooms yet</div>
+        <div style="color:#64748b;font-size:14px">Create a room or join one with a code</div>
       </div>
     </div>
   </div>
@@ -170,29 +155,42 @@
 
 <!-- ══════ SCREEN 3 — CHAT ══════ -->
 <div id="screen-chat" class="screen">
-
-  <!-- LOCKED header -->
+  <!-- Locked header -->
   <div id="chat-header">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="leaveRoom()" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:22px;line-height:1;padding:0 6px 2px">‹</button>
       <div>
         <div id="chat-room-name" style="font-weight:700;font-size:15px"></div>
-        <div id="chat-online" style="font-size:12px;color:#10b981"></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div id="chat-online" style="font-size:12px;color:#10b981"></div>
+          <span id="room-code-small" style="font-size:11px;color:#475569;font-family:monospace"></span>
+        </div>
       </div>
     </div>
-    <button class="btn-ghost" onclick="toggleUsers()">👥 <span id="chat-user-count">0</span> online</button>
-
-    <!-- Users dropdown — inside header so it positions correctly -->
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn-ghost" onclick="toggleUsers()" style="padding:6px 10px">👥 <span id="chat-user-count">0</span></button>
+      <button class="btn-ghost" onclick="openRoomInfo()" style="padding:6px 10px">ℹ️</button>
+    </div>
     <div id="users-panel">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#475569;margin-bottom:8px;font-weight:600">In this room</div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#475569;margin-bottom:8px;font-weight:600">Online now</div>
       <div id="users-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
   </div>
 
-  <!-- ONLY THIS SCROLLS -->
+  <!-- Pinned message bar -->
+  <div id="pinned-bar">
+    <span style="font-size:14px">📌</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-bottom:1px">Pinned message</div>
+      <div id="pinned-text" style="font-size:13px;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+    </div>
+    <button id="unpin-btn" style="display:none;background:none;border:none;color:#64748b;cursor:pointer;font-size:16px" onclick="unpinMessage()">✕</button>
+  </div>
+
+  <!-- Messages -->
   <div id="chat-box"></div>
 
-  <!-- LOCKED bottom bar -->
+  <!-- Locked bottom -->
   <div id="chat-bottom">
     <div id="typing-bar"></div>
     <div id="input-row">
@@ -202,13 +200,63 @@
       </button>
     </div>
   </div>
-
 </div>
 
-<!-- Profile panel (fixed overlay, works from any screen) -->
-<div id="profile-panel">
+<!-- ══════ OVERLAYS ══════ -->
+
+<!-- Create Room -->
+<div id="overlay-create" class="overlay">
+  <div class="card">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Create a Room</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">A 6-digit code will be auto-generated</p>
+    <div class="field"><label>Room Name</label><input id="cr-name" type="text" placeholder="e.g. Study Group, Team Chat" maxlength="40"/></div>
+    <div class="field"><label>Room Password</label><input id="cr-pass" type="password" placeholder="Min 4 characters"/></div>
+    <div class="err" id="cr-err"></div>
+    <button class="btn-primary" onclick="doCreateRoom()">Create Room →</button>
+    <button onclick="closeOverlay('overlay-create')" style="width:100%;background:none;border:none;color:#64748b;cursor:pointer;padding:10px;margin-top:6px;font-size:14px">Cancel</button>
+  </div>
+</div>
+
+<!-- Join Room -->
+<div id="overlay-join" class="overlay">
+  <div class="card">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Join a Room</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Ask the room owner for the 6-digit code</p>
+    <div class="field"><label>Room Code</label><input id="jr-code" type="text" placeholder="6-digit code" maxlength="6" style="font-family:monospace;font-size:18px;letter-spacing:4px;text-align:center"/></div>
+    <div class="field"><label>Room Password</label><input id="jr-pass" type="password" placeholder="Room password"/></div>
+    <div class="err" id="jr-err"></div>
+    <button class="btn-primary" onclick="doJoinRoom()">Join Room →</button>
+    <button onclick="closeOverlay('overlay-join')" style="width:100%;background:none;border:none;color:#64748b;cursor:pointer;padding:10px;margin-top:6px;font-size:14px">Cancel</button>
+  </div>
+</div>
+
+<!-- Room Created Success -->
+<div id="overlay-created" class="overlay">
+  <div class="card" style="text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">🎉</div>
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:6px">Room Created!</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Share this code with people you want to invite</p>
+    <div class="code-badge" id="new-room-code"></div>
+    <p style="font-size:12px;color:#475569;margin-top:8px;margin-bottom:20px">They'll also need the room password you set</p>
+    <button class="btn-primary" onclick="enterCreatedRoom()">Enter Room →</button>
+  </div>
+</div>
+
+<!-- Room Info -->
+<div id="overlay-room-info" class="overlay">
+  <div class="card" style="max-width:380px;max-height:80dvh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h2 style="font-size:18px;font-weight:700">Room Info</h2>
+      <button onclick="closeOverlay('overlay-room-info')" style="background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="room-info-content"></div>
+  </div>
+</div>
+
+<!-- Profile -->
+<div id="overlay-profile" class="overlay">
   <div class="card" style="max-width:380px;position:relative">
-    <button onclick="closeProfile()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button>
+    <button onclick="closeOverlay('overlay-profile')" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button>
     <div style="text-align:center;margin-bottom:1.5rem">
       <div id="profile-avatar" class="avatar" style="width:64px;height:64px;font-size:22px;margin:0 auto 10px"></div>
       <div id="profile-name-display" style="font-size:18px;font-weight:700"></div>
@@ -226,24 +274,41 @@
   </div>
 </div>
 
+<!-- Confirm Dialog -->
+<div id="overlay-confirm" class="overlay">
+  <div class="confirm-card">
+    <div style="font-size:32px;margin-bottom:12px" id="confirm-icon">⚠️</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px" id="confirm-title"></div>
+    <div style="font-size:14px;color:#94a3b8;margin-bottom:20px" id="confirm-msg"></div>
+    <button class="btn-danger" id="confirm-ok">Confirm</button>
+    <button onclick="closeOverlay('overlay-confirm')" style="width:100%;background:none;border:none;color:#64748b;cursor:pointer;padding:10px;margin-top:4px;font-size:14px">Cancel</button>
+  </div>
+</div>
+
+<!-- Context Menu (long press) -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-copy" onclick="ctxCopy()">📋 Copy message</div>
+  <div class="ctx-item" id="ctx-pin" onclick="ctxPin()">📌 Pin message</div>
+  <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">🗑 Delete message</div>
+</div>
+
 <script>
 // ══ STATE ══
 let currentUser = null;
 let socket = null;
-let currentRoom = null;
+let currentRoom = null; // { roomCode, name, isOwner }
 let typingTimer = null;
 let isTyping = false;
 const typingUsers = new Set();
+let ctxTarget = null; // { messageId, text, isMine, timestamp }
+let createdRoomData = null;
+let longPressTimer = null;
 
-// ══ AUTO-LOGIN ══
+// ══ INIT ══
 (async () => {
   try {
     const res = await fetch("/api/me");
-    if (res.ok) {
-      const { user } = await res.json();
-      currentUser = user;
-      showRoomsScreen();
-    }
+    if (res.ok) { const { user } = await res.json(); currentUser = user; showRoomsScreen(); }
   } catch {}
 })();
 
@@ -252,20 +317,21 @@ function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
-
 function showRoomsScreen() {
   showScreen("screen-rooms");
   document.getElementById("hdr-name").textContent = currentUser.name;
   setAvatar("hdr-avatar", currentUser.initials, currentUser.avatarColor, 36);
-  loadRecentRooms();
   connectSocket();
+  loadRooms();
 }
-
-function showChatScreen(roomId) {
-  currentRoom = roomId;
+function showChatScreen(room) {
+  currentRoom = room;
   showScreen("screen-chat");
-  document.getElementById("chat-room-name").textContent = "# " + roomId;
+  document.getElementById("chat-room-name").textContent = room.name;
+  document.getElementById("room-code-small").textContent = "Code: " + room.roomCode;
   document.getElementById("msg-input").focus();
+  // Reset pinned bar
+  document.getElementById("pinned-bar").classList.remove("visible");
 }
 
 // ══ AUTH ══
@@ -275,20 +341,16 @@ function switchTab(tab) {
   document.getElementById("tab-login").classList.toggle("active", tab === "login");
   document.getElementById("tab-register").classList.toggle("active", tab === "register");
 }
-
 async function doRegister() {
   const body = { name: v("r-name"), mobile: v("r-mobile"), password: v("r-pass"), age: v("r-age"), gender: v("r-gender") };
-  if (!body.name || !body.mobile || !body.password || !body.age || !body.gender)
-    return showErr("r-err", "Please fill in all fields");
+  if (!body.name || !body.mobile || !body.password || !body.age || !body.gender) return showErr("r-err", "Please fill in all fields");
   try {
     const res = await fetch("/api/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
     const data = await res.json();
     if (!res.ok) return showErr("r-err", data.error);
-    currentUser = data.user;
-    showRoomsScreen();
-  } catch { showErr("r-err", "Network error, try again"); }
+    currentUser = data.user; showRoomsScreen();
+  } catch { showErr("r-err", "Network error"); }
 }
-
 async function doLogin() {
   const body = { mobile: v("l-mobile"), password: v("l-pass") };
   if (!body.mobile || !body.password) return showErr("l-err", "Enter mobile and password");
@@ -296,76 +358,162 @@ async function doLogin() {
     const res = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
     const data = await res.json();
     if (!res.ok) return showErr("l-err", data.error);
-    currentUser = data.user;
-    showRoomsScreen();
-  } catch { showErr("l-err", "Network error, try again"); }
+    currentUser = data.user; showRoomsScreen();
+  } catch { showErr("l-err", "Network error"); }
 }
-
 async function doLogout() {
   await fetch("/api/logout", { method:"POST" });
-  socket?.disconnect();
-  socket = null; currentUser = null; currentRoom = null;
+  socket?.disconnect(); socket = null; currentUser = null; currentRoom = null;
   showScreen("screen-auth");
 }
 
 // ══ ROOMS ══
-async function loadRecentRooms() {
+async function loadRooms() {
+  document.getElementById("rooms-loading").style.display = "block";
+  document.getElementById("rooms-list").innerHTML = "";
+  document.getElementById("rooms-empty").style.display = "none";
   try {
     const res = await fetch("/api/rooms");
     const { rooms } = await res.json();
-    const section = document.getElementById("recent-rooms-section");
-    const list = document.getElementById("recent-rooms-list");
-    if (!rooms || rooms.length === 0) { section.style.display = "none"; return; }
-    section.style.display = "block";
-    list.innerHTML = rooms.slice().reverse().slice(0, 8).map(r => `
-      <div class="room-chip" onclick="enterRoom('${esc(r)}')">
-        <div style="width:34px;height:34px;background:#6366f1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px">💬</div>
-        <div>
-          <div style="font-weight:600;font-size:14px">${esc(r)}</div>
-          <div style="font-size:12px;color:#64748b">Tap to rejoin</div>
+    document.getElementById("rooms-loading").style.display = "none";
+    if (!rooms || rooms.length === 0) { document.getElementById("rooms-empty").style.display = "block"; return; }
+    document.getElementById("rooms-list").innerHTML = rooms.map(r => `
+      <div class="room-chip" onclick="enterRoom(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+        <div style="width:42px;height:42px;background:${r.isOwner ? '#6366f1' : '#1e293b'};border:1px solid #334155;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">
+          ${r.isOwner ? '👑' : '💬'}
         </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">
+            ${esc(r.name)}
+            ${r.isOwner ? '<span style="font-size:10px;background:#6366f1;color:#fff;padding:2px 6px;border-radius:4px">Owner</span>' : ''}
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px">Code: <span style="font-family:monospace;color:#818cf8">${r.roomCode}</span> · ${r.memberCount} members</div>
+        </div>
+        <div style="color:#475569;font-size:18px">›</div>
       </div>`).join("");
-  } catch {}
+  } catch { document.getElementById("rooms-loading").textContent = "Failed to load rooms"; }
 }
 
-function joinRoomByName() {
-  const name = document.getElementById("new-room-input").value.trim();
-  if (!name) return;
-  enterRoom(name);
+function openCreateRoom() { document.getElementById("cr-name").value = ""; document.getElementById("cr-pass").value = ""; document.getElementById("cr-err").style.display = "none"; openOverlay("overlay-create"); }
+function openJoinRoom() { document.getElementById("jr-code").value = ""; document.getElementById("jr-pass").value = ""; document.getElementById("jr-err").style.display = "none"; openOverlay("overlay-join"); }
+
+async function doCreateRoom() {
+  const name = v("cr-name"), password = v("cr-pass");
+  if (!name || !password) return showErr("cr-err", "Room name and password required");
+  if (password.length < 4) return showErr("cr-err", "Password must be at least 4 characters");
+  try {
+    const res = await fetch("/api/rooms/create", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ name, password }) });
+    const data = await res.json();
+    if (!res.ok) return showErr("cr-err", data.error);
+    createdRoomData = data.room;
+    closeOverlay("overlay-create");
+    document.getElementById("new-room-code").textContent = data.room.roomCode;
+    openOverlay("overlay-created");
+    loadRooms();
+  } catch { showErr("cr-err", "Server error"); }
 }
 
-function enterRoom(roomId) {
-  showChatScreen(roomId);
+async function doJoinRoom() {
+  const roomCode = v("jr-code"), password = v("jr-pass");
+  if (!roomCode || !password) return showErr("jr-err", "Room code and password required");
+  try {
+    const res = await fetch("/api/rooms/join", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ roomCode, password }) });
+    const data = await res.json();
+    if (!res.ok) return showErr("jr-err", data.error);
+    closeOverlay("overlay-join");
+    loadRooms();
+    enterRoom(data.room);
+  } catch { showErr("jr-err", "Server error"); }
+}
+
+function enterCreatedRoom() { closeOverlay("overlay-created"); if (createdRoomData) enterRoom(createdRoomData); }
+
+function enterRoom(room) {
   document.getElementById("chat-box").innerHTML = "";
-  socket.emit("join_room", { roomId });
+  document.getElementById("pinned-bar").classList.remove("visible");
+  showChatScreen(room);
+  socket.emit("join_room", { roomCode: room.roomCode });
 }
 
 function leaveRoom() {
   currentRoom = null;
   document.getElementById("chat-box").innerHTML = "";
   showScreen("screen-rooms");
-  loadRecentRooms();
+  loadRooms();
+}
+
+// ══ ROOM INFO ══
+async function openRoomInfo() {
+  if (!currentRoom) return;
+  openOverlay("overlay-room-info");
+  document.getElementById("room-info-content").innerHTML = '<div style="text-align:center;color:#64748b;padding:1rem">Loading…</div>';
+  try {
+    const res = await fetch(`/api/rooms/${currentRoom.roomCode}`);
+    const data = await res.json();
+    const r = data.room;
+    const created = new Date(r.createdAt).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+    document.getElementById("room-info-content").innerHTML = `
+      <div style="background:#0f172a;border-radius:10px;padding:12px;margin-bottom:14px">
+        <div style="font-size:12px;color:#64748b;margin-bottom:4px">Room Code</div>
+        <div class="code-badge">${r.roomCode}</div>
+        <div style="font-size:12px;color:#475569;text-align:center;margin-top:6px">Share with friends to invite them</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:#0f172a;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#818cf8">${data.messageCount}</div>
+          <div style="font-size:11px;color:#64748b">Messages</div>
+        </div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#10b981">${r.memberCount}</div>
+          <div style="font-size:11px;color:#64748b">Members</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#475569;margin-bottom:10px">Created ${created}</div>
+      <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Members</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+        ${data.members.map(m => `
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="avatar" style="width:30px;height:30px;font-size:11px;background:${m.avatarColor}">${esc(m.initials)}</div>
+            <span style="font-size:14px">${esc(m.name)}</span>
+            ${r.isOwner && m.id === data.members.find(x=>x)?.id ? '<span style="font-size:10px;background:#6366f1;color:#fff;padding:2px 6px;border-radius:4px;margin-left:auto">Owner</span>' : ''}
+          </div>`).join("")}
+      </div>
+      ${r.isOwner ? `<button class="btn-danger" onclick="confirmDeleteRoom()">🗑 Delete Room</button>` : ''}
+    `;
+  } catch { document.getElementById("room-info-content").innerHTML = '<div style="color:#f87171">Failed to load info</div>'; }
+}
+
+function confirmDeleteRoom() {
+  closeOverlay("overlay-room-info");
+  showConfirm("⚠️", "Delete Room?", "This will permanently delete all messages and remove all members.", async () => {
+    try {
+      const res = await fetch(`/api/rooms/${currentRoom.roomCode}`, { method:"DELETE" });
+      if (res.ok) { leaveRoom(); }
+    } catch {}
+  });
 }
 
 // ══ SOCKET ══
 function connectSocket() {
   if (socket?.connected) return;
   socket = io(window.location.origin, { auth: { token: getCookie("token") } });
-  socket.on("connect", () => console.log("Socket connected"));
+  socket.on("connect", () => console.log("✅ Socket connected"));
   socket.on("connect_error", err => console.error("Socket error:", err.message));
+  socket.on("error_msg", msg => alert(msg));
 
   socket.on("chat_history", (messages) => {
     const box = document.getElementById("chat-box");
     box.innerHTML = "";
-    if (messages.length > 0) {
-      appendSystem("— Chat history —");
-      messages.forEach(renderMessage);
-      appendSystem("— Live —");
-    }
+    messages.forEach(renderMessage);
     scrollBottom();
   });
 
   socket.on("new_message", (msg) => { renderMessage(msg); scrollBottom(); });
+
+  socket.on("message_deleted", ({ messageId }) => {
+    const el = document.getElementById("msg-" + messageId);
+    if (el) el.remove();
+  });
 
   socket.on("room_update", ({ userCount, users }) => {
     document.getElementById("chat-user-count").textContent = userCount;
@@ -377,6 +525,26 @@ function connectSocket() {
       </div>`).join("");
   });
 
+  socket.on("pin_updated", ({ pinnedMessage }) => {
+    // Clear old pin styling
+    document.querySelectorAll(".pinned-bubble").forEach(el => el.classList.remove("pinned-bubble"));
+    const bar = document.getElementById("pinned-bar");
+    if (pinnedMessage && !pinnedMessage.deleted) {
+      bar.classList.add("visible");
+      document.getElementById("pinned-text").textContent = pinnedMessage.username + ": " + pinnedMessage.text;
+      document.getElementById("unpin-btn").style.display = currentRoom?.isOwner ? "block" : "none";
+      const el = document.getElementById("msg-" + pinnedMessage._id);
+      if (el) el.querySelector(".bubble")?.classList.add("pinned-bubble");
+    } else {
+      bar.classList.remove("visible");
+    }
+  });
+
+  socket.on("room_deleted", () => {
+    alert("This room was deleted by the owner.");
+    leaveRoom();
+  });
+
   socket.on("user_typing", ({ username }) => { typingUsers.add(username); updateTypingBar(); });
   socket.on("user_stop_typing", ({ username }) => { typingUsers.delete(username); updateTypingBar(); });
 }
@@ -386,7 +554,7 @@ function sendMessage() {
   const input = document.getElementById("msg-input");
   const text = input.value.trim();
   if (!text || !socket || !currentRoom) return;
-  socket.emit("send_message", { roomId: currentRoom, text });
+  socket.emit("send_message", { roomCode: currentRoom.roomCode, text });
   input.value = "";
   input.style.height = "auto";
   stopTyping();
@@ -397,7 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
   input.addEventListener("input", () => {
     input.style.height = "auto";
     input.style.height = Math.min(input.scrollHeight, 120) + "px";
-    if (!isTyping) { isTyping = true; socket?.emit("typing_start", { roomId: currentRoom }); }
+    if (!isTyping) { isTyping = true; socket?.emit("typing_start", { roomCode: currentRoom?.roomCode }); }
     clearTimeout(typingTimer);
     typingTimer = setTimeout(stopTyping, 1500);
   });
@@ -407,9 +575,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function stopTyping() {
-  if (isTyping) { isTyping = false; socket?.emit("typing_stop", { roomId: currentRoom }); }
+  if (isTyping) { isTyping = false; socket?.emit("typing_stop", { roomCode: currentRoom?.roomCode }); }
 }
-
 function updateTypingBar() {
   const bar = document.getElementById("typing-bar");
   const others = [...typingUsers].filter(u => u !== currentUser?.name);
@@ -417,25 +584,28 @@ function updateTypingBar() {
   bar.textContent = others.length === 1 ? `${others[0]} is typing…` : `${others.length} people are typing…`;
 }
 
-// ══ RENDER MESSAGES ══
+// ══ RENDER ══
 function renderMessage(msg) {
   if (msg.type === "system") { appendSystem(msg.text); return; }
   const box = document.getElementById("chat-box");
-  const isMine = msg.username === currentUser?.name;
+  const isMine = msg.senderId === currentUser?.id || msg.username === currentUser?.name;
 
   const wrapper = document.createElement("div");
-  wrapper.style.cssText = `display:flex;align-items:flex-end;gap:7px;${isMine ? "flex-direction:row-reverse" : ""}`;
+  wrapper.id = "msg-" + msg._id;
+  wrapper.className = "bubble-wrap";
+  wrapper.style.cssText = isMine ? "flex-direction:row-reverse" : "";
 
-  // Avatar — always show initials from first letter of username
+  // Avatar
   const av = document.createElement("div");
   av.className = "avatar";
   av.style.cssText = `width:30px;height:30px;font-size:11px;background:${msg.avatarColor || "#6366f1"};flex-shrink:0`;
-  // Use first letter of name as fallback if initials missing
   av.textContent = (msg.initials || msg.username || "?").charAt(0).toUpperCase();
   wrapper.appendChild(av);
 
   const bubble = document.createElement("div");
   bubble.className = `bubble ${isMine ? "bubble-mine" : "bubble-theirs"}`;
+  if (msg.pinned) bubble.classList.add("pinned-bubble");
+
   if (!isMine) {
     const nameEl = document.createElement("span");
     nameEl.className = "bname";
@@ -445,10 +615,22 @@ function renderMessage(msg) {
   const textEl = document.createElement("span");
   textEl.textContent = msg.text;
   bubble.appendChild(textEl);
+
   const timeEl = document.createElement("span");
   timeEl.className = "btime";
-  timeEl.textContent = formatTime(msg.timestamp);
+  // Show delete timer if mine and within 5 min
+  const age = Date.now() - new Date(msg.timestamp).getTime();
+  const canDelete = isMine && age < 5 * 60 * 1000;
+  timeEl.textContent = formatTime(msg.timestamp) + (canDelete ? " · hold to delete" : "");
   bubble.appendChild(timeEl);
+
+  // Long press / right click for context menu
+  bubble.addEventListener("contextmenu", e => { e.preventDefault(); openCtxMenu(e, msg, isMine); });
+  bubble.addEventListener("touchstart", () => {
+    longPressTimer = setTimeout(() => openCtxMenu(null, msg, isMine), 600);
+  }, { passive: true });
+  bubble.addEventListener("touchend", () => clearTimeout(longPressTimer));
+  bubble.addEventListener("touchmove", () => clearTimeout(longPressTimer));
 
   wrapper.appendChild(bubble);
   box.appendChild(wrapper);
@@ -461,10 +643,86 @@ function appendSystem(text) {
   d.textContent = text;
   box.appendChild(d);
 }
+function scrollBottom() { const box = document.getElementById("chat-box"); box.scrollTop = box.scrollHeight; }
 
-function scrollBottom() {
-  const box = document.getElementById("chat-box");
-  box.scrollTop = box.scrollHeight;
+// ══ CONTEXT MENU ══
+function openCtxMenu(e, msg, isMine) {
+  ctxTarget = msg;
+  const menu = document.getElementById("ctx-menu");
+  const age = Date.now() - new Date(msg.timestamp).getTime();
+  const canDelete = isMine && age < 5 * 60 * 1000;
+  const canPin = currentRoom?.isOwner;
+
+  document.getElementById("ctx-delete").style.display = canDelete ? "flex" : "none";
+  document.getElementById("ctx-pin").style.display = canPin ? "flex" : "none";
+  document.getElementById("ctx-pin").textContent = msg.pinned ? "📌 Unpin message" : "📌 Pin message";
+
+  if (e) {
+    menu.style.left = Math.min(e.clientX, window.innerWidth - 180) + "px";
+    menu.style.top = Math.min(e.clientY, window.innerHeight - 140) + "px";
+  } else {
+    menu.style.left = "50%";
+    menu.style.top = "50%";
+    menu.style.transform = "translate(-50%, -50%)";
+  }
+  menu.classList.add("open");
+}
+
+function closeCtxMenu() { document.getElementById("ctx-menu").classList.remove("open"); document.getElementById("ctx-menu").style.transform = ""; }
+
+function ctxCopy() {
+  if (ctxTarget) navigator.clipboard?.writeText(ctxTarget.text).catch(() => {});
+  closeCtxMenu();
+}
+
+function ctxDelete() {
+  closeCtxMenu();
+  if (!ctxTarget) return;
+  const age = Date.now() - new Date(ctxTarget.timestamp).getTime();
+  if (age > 5 * 60 * 1000) return alert("Can only delete within 5 minutes of sending");
+  showConfirm("🗑", "Delete Message?", "This message will be removed for everyone.", () => {
+    socket.emit("delete_message", { messageId: ctxTarget._id, roomCode: currentRoom.roomCode });
+  });
+}
+
+function ctxPin() {
+  closeCtxMenu();
+  if (!ctxTarget || !currentRoom?.isOwner) return;
+  fetch(`/api/rooms/${currentRoom.roomCode}/pin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messageId: ctxTarget._id })
+  });
+}
+
+function unpinMessage() {
+  if (!currentRoom?.isOwner || !ctxTarget) {
+    // Find current pinned from bar
+    fetch(`/api/rooms/${currentRoom.roomCode}/pin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messageId: document.getElementById("pinned-bar").dataset.msgId || "" })
+    });
+  }
+}
+
+document.addEventListener("click", e => {
+  if (!e.target.closest("#ctx-menu")) closeCtxMenu();
+  if (!e.target.closest("#users-panel") && !e.target.closest(".btn-ghost")) {
+    document.getElementById("users-panel")?.classList.remove("open");
+  }
+});
+
+// ══ OVERLAYS ══
+function openOverlay(id) { document.getElementById(id).classList.add("open"); }
+function closeOverlay(id) { document.getElementById(id).classList.remove("open"); }
+
+function showConfirm(icon, title, msg, onConfirm) {
+  document.getElementById("confirm-icon").textContent = icon;
+  document.getElementById("confirm-title").textContent = title;
+  document.getElementById("confirm-msg").textContent = msg;
+  document.getElementById("confirm-ok").onclick = () => { closeOverlay("overlay-confirm"); onConfirm(); };
+  openOverlay("overlay-confirm");
 }
 
 // ══ PROFILE ══
@@ -475,11 +733,8 @@ function openProfile() {
   document.getElementById("profile-name-display").textContent = currentUser.name;
   document.getElementById("profile-mobile-display").textContent = "📱 " + currentUser.mobile;
   setAvatar("profile-avatar", currentUser.initials, currentUser.avatarColor, 64);
-  document.getElementById("profile-panel").classList.add("open");
+  openOverlay("overlay-profile");
 }
-
-function closeProfile() { document.getElementById("profile-panel").classList.remove("open"); }
-
 async function saveProfile() {
   const body = { name: v("p-name"), age: v("p-age"), gender: v("p-gender") };
   if (!body.name || !body.age || !body.gender) return showErr("p-err", "All fields required");
@@ -490,41 +745,26 @@ async function saveProfile() {
     currentUser = data.user;
     setAvatar("hdr-avatar", currentUser.initials, currentUser.avatarColor, 36);
     document.getElementById("hdr-name").textContent = currentUser.name;
-    closeProfile();
+    closeOverlay("overlay-profile");
   } catch { showErr("p-err", "Save failed"); }
 }
 
 // ══ UTILS ══
+function toggleUsers() { document.getElementById("users-panel").classList.toggle("open"); }
 function v(id) { return document.getElementById(id)?.value?.trim() || ""; }
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function formatTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); }
 function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = "block"; }
-
-// setAvatar — always uses first letter of name as fallback
 function setAvatar(id, initials, color, size) {
   const el = document.getElementById(id);
   if (!el) return;
-  const letter = (initials || "?").charAt(0).toUpperCase();
-  el.textContent = letter;
+  el.textContent = (initials || "?").charAt(0).toUpperCase();
   el.style.background = color || "#6366f1";
-  if (size) {
-    el.style.width = size + "px";
-    el.style.height = size + "px";
-    el.style.fontSize = Math.round(size * 0.38) + "px";
-  }
+  if (size) { el.style.width = size + "px"; el.style.height = size + "px"; el.style.fontSize = Math.round(size * .38) + "px"; }
 }
-
 function getCookie(name) {
   return document.cookie.split(";").find(c => c.trim().startsWith(name + "="))?.split("=")[1] || "";
 }
-
-function toggleUsers() { document.getElementById("users-panel").classList.toggle("open"); }
-
-document.addEventListener("click", e => {
-  const panel = document.getElementById("users-panel");
-  if (!e.target.closest("#users-panel") && !e.target.closest(".btn-ghost"))
-    panel?.classList.remove("open");
-});
 </script>
 </body>
 </html>
