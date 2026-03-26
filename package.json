@@ -1,7 +1,7 @@
 {
-  "name": "chatroom-v2",
-  "version": "2.0.0",
-  "description": "Real-time chat with MongoDB, auth, profiles",
+  "name": "chatroom-v3",
+  "version": "3.0.0",
+  "description": "Real-time chat with protected rooms, message delete, pin",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
