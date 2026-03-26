@@ -24,7 +24,8 @@ userSchema.methods.comparePassword = function (plain) {
 const roomSchema = new mongoose.Schema({
   roomCode:     { type: String, required: true, unique: true, length: 6 },
   name:         { type: String, required: true, trim: true, maxlength: 40 },
-  passwordHash: { type: String, required: true },
+  passwordHash:  { type: String, required: true },
+  plainPassword: { type: String, required: true },
   owner:        { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   members:      [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   pinnedMessage:{ type: mongoose.Schema.Types.ObjectId, ref: "Message", default: null },
