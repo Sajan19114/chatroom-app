@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel — ChatRoom</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:#080d14;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column}
+    ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:4px}
+    /* Login */
+    #login-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .login-card{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:2.5rem;width:100%;max-width:380px}
+    .login-card h1{font-size:20px;font-weight:700;margin-bottom:4px}
+    .login-card p{font-size:13px;color:#475569;margin-bottom:24px}
+    /* Layout */
+    #app{display:none;flex:1;flex-direction:column;height:100vh;overflow:hidden}
+    #app.visible{display:flex}
+    /* Topbar */
+    #topbar{background:#0f172a;border-bottom:1px solid #1e293b;padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    #topbar h1{font-size:16px;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px}
+    /* Sidebar + Content */
+    #body{display:flex;flex:1;overflow:hidden}
+    #sidebar{width:200px;background:#0a1120;border-right:1px solid #1e293b;padding:12px 8px;display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+    .nav-item{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;display:flex;align-items:center;gap:8px;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+    .nav-item:hover{background:#1e293b;color:#f1f5f9}
+    .nav-item.active{background:#1e293b;color:#f1f5f9}
+    .nav-item .icon{font-size:15px;width:20px;text-align:center}
+    /* Content */
+    #content{flex:1;overflow-y:auto;padding:20px}
+    /* Stats cards */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+    .stat-card{background:#0f172a;border:1px solid #1e293b;border-radius:12px;padding:16px}
+    .stat-card .val{font-size:28px;font-weight:700;margin-bottom:4px}
+    .stat-card .lbl{font-size:12px;color:#64748b}
+    /* Tables */
+    .section-title{font-size:14px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+    .table-wrap{background:#0f172a;border:1px solid #1e293b;border-radius:12px;overflow:hidden;margin-bottom:24px}
+    table{width:100%;border-collapse:collapse}
+    th{font-size:11px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;border-bottom:1px solid #1e293b;text-align:left;background:#080d14}
+    td{padding:11px 14px;font-size:13px;border-bottom:1px solid #0f172a;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#0f172a}
+    /* Badges */
+    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+    .badge-green{background:#052e16;color:#4ade80}
+    .badge-red{background:#450a0a;color:#f87171}
+    .badge-blue{background:#1e3a5f;color:#60a5fa}
+    .badge-yellow{background:#422006;color:#fbbf24}
+    /* Buttons */
+    .btn{padding:6px 12px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+    .btn-sm-red{background:#450a0a;color:#f87171;border:1px solid #7f1d1d}.btn-sm-red:hover{background:#7f1d1d}
+    .btn-sm-green{background:#052e16;color:#4ade80;border:1px solid #14532d}.btn-sm-green:hover{background:#14532d}
+    .btn-sm-blue{background:#1e3a5f;color:#60a5fa;border:1px solid #1d4ed8}.btn-sm-blue:hover{background:#1d4ed8;color:#fff}
+    .btn-sm-gray{background:#1e293b;color:#94a3b8;border:1px solid #334155}.btn-sm-gray:hover{background:#334155;color:#f1f5f9}
+    .btn-primary-full{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px}
+    .btn-primary-full:hover{background:#818cf8}
+    /* Search */
+    .search-input{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:8px 12px;color:#f1f5f9;font-size:13px;outline:none;width:220px}
+    .search-input:focus{border-color:#6366f1}
+    /* Field */
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+    .field input{width:100%;background:#080d14;border:1px solid #1e293b;border-radius:8px;padding:10px 12px;color:#f1f5f9;font-size:14px;outline:none}
+    .field input:focus{border-color:#6366f1}
+    .err{color:#f87171;font-size:13px;padding:8px 12px;background:#450a0a;border-radius:8px;border:1px solid #7f1d1d;margin-top:8px;display:none}
+    /* Messages view */
+    #msg-view-panel{position:fixed;right:0;top:0;bottom:0;width:420px;background:#0a1120;border-left:1px solid #1e293b;z-index:50;display:none;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.5)}
+    #msg-view-panel.open{display:flex}
+    #msg-view-box{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:6px}
+    .amsg{padding:8px 12px;border-radius:10px;font-size:13px;line-height:1.5;max-width:85%}
+    .amsg-user{background:#1e293b;align-self:flex-start}
+    .amsg-sys{align-self:center;font-size:11px;color:#475569;background:none;padding:2px 0}
+    .amsg .aname{font-size:11px;font-weight:600;color:#818cf8;margin-bottom:2px}
+    .amsg .atime{font-size:10px;color:#475569;margin-top:3px}
+    /* Modal */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-bg.open{display:flex}
+    .modal{background:#0f172a;border:1px solid #1e293b;border-radius:16px;padding:1.5rem;width:100%;max-width:380px}
+    /* Log */
+    .log-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #0f172a;font-size:13px}
+    .log-item:last-child{border-bottom:none}
+    .log-action{font-weight:600;min-width:110px}
+    .log-detail{color:#94a3b8;flex:1}
+    .log-time{color:#475569;font-size:11px;white-space:nowrap}
+    /* Live dot */
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block;margin-right:4px;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    /* Empty state */
+    .empty{text-align:center;padding:3rem;color:#475569;font-size:14px}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>🔐 Admin Panel</h1>
+    <p>ChatRoom administration — restricted access</p>
+    <div class="field"><label>Username</label><input id="a-user" type="text" placeholder="Admin username" autocomplete="off"/></div>
+    <div class="field"><label>Password</label><input id="a-pass" type="password" placeholder="Admin password"/></div>
+    <div class="err" id="a-err"></div>
+    <button class="btn-primary-full" onclick="doAdminLogin()">Login to Dashboard</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app">
+  <!-- Topbar -->
+  <div id="topbar">
+    <h1>🛡️ Admin Dashboard <span style="font-size:12px;font-weight:400;color:#475569;margin-left:8px">ChatRoom</span></h1>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12px;color:#475569"><span class="live-dot"></span>Live</span>
+      <button onclick="doAdminLogout()" style="background:none;border:1px solid #334155;border-radius:7px;padding:6px 12px;color:#64748b;cursor:pointer;font-size:13px">Logout</button>
+    </div>
+  </div>
+
+  <div id="body">
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <button class="nav-item active" onclick="showTab('overview')" id="nav-overview"><span class="icon">📊</span> Overview</button>
+      <button class="nav-item" onclick="showTab('users')" id="nav-users"><span class="icon">👥</span> Users</button>
+      <button class="nav-item" onclick="showTab('rooms')" id="nav-rooms"><span class="icon">🏠</span> Rooms</button>
+      <button class="nav-item" onclick="showTab('activity')" id="nav-activity"><span class="icon">📋</span> Activity Log</button>
+    </div>
+
+    <!-- Content -->
+    <div id="content">
+
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="val" id="s-users" style="color:#818cf8">—</div><div class="lbl">Total Users</div></div>
+          <div class="stat-card"><div class="val" id="s-rooms" style="color:#10b981">—</div><div class="lbl">Total Rooms</div></div>
+          <div class="stat-card"><div class="val" id="s-msgs" style="color:#f59e0b">—</div><div class="lbl">Total Messages</div></div>
+          <div class="stat-card"><div class="val" id="s-online" style="color:#34d399">—</div><div class="lbl">Online Now</div></div>
+          <div class="stat-card"><div class="val" id="s-banned" style="color:#f87171">—</div><div class="lbl">Banned Users</div></div>
+        </div>
+        <div style="text-align:center;color:#334155;font-size:13px">Stats refresh every 15 seconds · <span id="last-refresh" style="color:#475569"></span></div>
+      </div>
+
+      <!-- USERS TAB -->
+      <div id="tab-users" style="display:none">
+        <div class="section-title">
+          All Users
+          <input class="search-input" placeholder="🔍 Search name or mobile…" oninput="searchUsers(this.value)" id="user-search"/>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Mobile</th><th>Age/Gender</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="users-tbody"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ROOMS TAB -->
+      <div id="tab-rooms" style="display:none">
+        <div class="section-title">
+          All Rooms
+          <input class="search-input" placeholder="🔍 Search name or code…" oninput="searchRooms(this.value)" id="room-search"/>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Room Name</th><th>Code</th><th>Password</th><th>Owner</th><th>Members</th><th>Messages</th><th>Online</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody id="rooms-tbody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACTIVITY TAB -->
+      <div id="tab-activity" style="display:none">
+        <div class="section-title">Admin Activity Log</div>
+        <div class="table-wrap" style="padding:0 14px">
+          <div id="activity-list"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /body -->
+</div><!-- /app -->
+
+<!-- Message View Panel -->
+<div id="msg-view-panel">
+  <div style="padding:14px 16px;border-bottom:1px solid #1e293b;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div>
+      <div id="msg-view-title" style="font-weight:700;font-size:15px"></div>
+      <div style="font-size:12px;color:#475569">Read-only view</div>
+    </div>
+    <button onclick="closeMsgView()" style="background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button>
+  </div>
+  <div id="msg-view-box"></div>
+</div>
+
+<!-- Ban Modal -->
+<div id="modal-ban" class="modal-bg">
+  <div class="modal">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:8px">🚫 Ban User</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:16px" id="ban-modal-name"></p>
+    <div class="field"><label>Reason (optional)</label><input id="ban-reason" type="text" placeholder="e.g. Spam, harassment…"/></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-sm-red" style="flex:1;padding:10px" onclick="confirmBan()">Confirm Ban</button>
+      <button class="btn btn-sm-gray" style="flex:1;padding:10px" onclick="closeModal('modal-ban')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div id="modal-confirm" class="modal-bg">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:32px;margin-bottom:10px" id="modal-confirm-icon">⚠️</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px" id="modal-confirm-title"></div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:20px" id="modal-confirm-desc"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm-red" style="flex:1;padding:10px" id="modal-confirm-ok">Delete</button>
+      <button class="btn btn-sm-gray" style="flex:1;padding:10px" onclick="closeModal('modal-confirm')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ STATE ══
+let banTargetId = null;
+let statsInterval = null;
+
+// ══ LOGIN ══
+async function doAdminLogin() {
+  const username = document.getElementById("a-user").value.trim();
+  const password = document.getElementById("a-pass").value.trim();
+  const err = document.getElementById("a-err");
+  err.style.display = "none";
+  try {
+    const res = await fetch("/api/admin/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error; err.style.display = "block"; return; }
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").classList.add("visible");
+    initDashboard();
+  } catch { err.textContent = "Network error"; err.style.display = "block"; }
+}
+
+document.getElementById("a-pass").addEventListener("keydown", e => { if (e.key === "Enter") doAdminLogin(); });
+
+async function doAdminLogout() {
+  await fetch("/api/admin/logout", { method: "POST" });
+  clearInterval(statsInterval);
+  document.getElementById("app").classList.remove("visible");
+  document.getElementById("login-screen").style.display = "flex";
+}
+
+// ══ INIT ══
+async function initDashboard() {
+  // Check if already logged in via cookie
+  try {
+    const res = await fetch("/api/admin/verify");
+    if (res.ok) {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app").classList.add("visible");
+    }
+  } catch {}
+
+  showTab("overview");
+  loadStats();
+  statsInterval = setInterval(loadStats, 15000);
+}
+
+// Auto-check on page load
+(async () => {
+  try {
+    const res = await fetch("/api/admin/verify");
+    if (res.ok) {
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app").classList.add("visible");
+      loadStats();
+      statsInterval = setInterval(loadStats, 15000);
+    }
+  } catch {}
+})();
+
+// ══ TABS ══
+function showTab(name) {
+  ["overview","users","rooms","activity"].forEach(t => {
+    document.getElementById("tab-" + t).style.display = t === name ? "block" : "none";
+    document.getElementById("nav-" + t).classList.toggle("active", t === name);
+  });
+  if (name === "users") loadUsers();
+  if (name === "rooms") loadRooms();
+  if (name === "activity") loadActivity();
+}
+
+// ══ STATS ══
+async function loadStats() {
+  try {
+    const res = await fetch("/api/admin/stats");
+    const data = await res.json();
+    document.getElementById("s-users").textContent = data.totalUsers;
+    document.getElementById("s-rooms").textContent = data.totalRooms;
+    document.getElementById("s-msgs").textContent = data.totalMessages.toLocaleString();
+    document.getElementById("s-online").textContent = data.onlineNow;
+    document.getElementById("s-banned").textContent = data.bannedUsers;
+    document.getElementById("last-refresh").textContent = "Updated " + new Date().toLocaleTimeString();
+  } catch {}
+}
+
+// ══ USERS ══
+let userSearchTimer = null;
+function searchUsers(q) { clearTimeout(userSearchTimer); userSearchTimer = setTimeout(() => loadUsers(q), 350); }
+
+async function loadUsers(search = "") {
+  const tbody = document.getElementById("users-tbody");
+  tbody.innerHTML = "<tr><td colspan='6' class='empty'>Loading…</td></tr>";
+  try {
+    const res = await fetch("/api/admin/users?search=" + encodeURIComponent(search));
+    const { users } = await res.json();
+    if (!users.length) { tbody.innerHTML = "<tr><td colspan='6' class='empty'>No users found</td></tr>"; return; }
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:28px;height:28px;border-radius:50%;background:${u.avatarColor};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${esc(u.initials)}</div>
+            <span style="font-weight:500">${esc(u.name)}</span>
+          </div>
+        </td>
+        <td style="font-family:monospace;color:#94a3b8">${esc(u.mobile)}</td>
+        <td style="color:#64748b">${u.age} / ${u.gender}</td>
+        <td>${u.banned
+          ? `<span class="badge badge-red">Banned</span>${u.banReason ? `<div style="font-size:11px;color:#64748b;margin-top:2px">${esc(u.banReason)}</div>` : ''}`
+          : `<span class="badge badge-green">Active</span>`}
+        </td>
+        <td style="color:#475569;font-size:12px">${fmtDate(u.createdAt)}</td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${u.banned
+              ? `<button class="btn btn-sm-green" onclick="unbanUser('${u._id}','${esc(u.name)}')">Unban</button>`
+              : `<button class="btn btn-sm-red" onclick="openBanModal('${u._id}','${esc(u.name)}')">Ban</button>`}
+            <button class="btn btn-sm-red" onclick="deleteUser('${u._id}','${esc(u.name)}')">Delete</button>
+          </div>
+        </td>
+      </tr>`).join("");
+  } catch { tbody.innerHTML = "<tr><td colspan='6' class='empty'>Failed to load</td></tr>"; }
+}
+
+function openBanModal(userId, name) {
+  banTargetId = userId;
+  document.getElementById("ban-modal-name").textContent = "Banning: " + name;
+  document.getElementById("ban-reason").value = "";
+  openModal("modal-ban");
+}
+async function confirmBan() {
+  const reason = document.getElementById("ban-reason").value.trim();
+  try {
+    await fetch(`/api/admin/users/${banTargetId}/ban`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason })
+    });
+    closeModal("modal-ban");
+    loadUsers(document.getElementById("user-search").value);
+    loadStats();
+  } catch {}
+}
+async function unbanUser(userId, name) {
+  await fetch(`/api/admin/users/${userId}/unban`, { method: "POST" });
+  loadUsers(document.getElementById("user-search").value);
+  loadStats();
+}
+function deleteUser(userId, name) {
+  showConfirmModal("🗑", "Delete User?", `Permanently delete "${name}" and all their data?`, async () => {
+    await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+    loadUsers(document.getElementById("user-search").value);
+    loadStats();
+  });
+}
+
+// ══ ROOMS ══
+let roomSearchTimer = null;
+function searchRooms(q) { clearTimeout(roomSearchTimer); roomSearchTimer = setTimeout(() => loadRooms(q), 350); }
+
+async function loadRooms(search = "") {
+  const tbody = document.getElementById("rooms-tbody");
+  tbody.innerHTML = "<tr><td colspan='9' class='empty'>Loading…</td></tr>";
+  try {
+    const res = await fetch("/api/admin/rooms?search=" + encodeURIComponent(search));
+    const { rooms } = await res.json();
+    if (!rooms.length) { tbody.innerHTML = "<tr><td colspan='9' class='empty'>No rooms found</td></tr>"; return; }
+    tbody.innerHTML = rooms.map(r => `
+      <tr>
+        <td style="font-weight:500">${esc(r.name)}</td>
+        <td><span style="font-family:monospace;font-size:14px;font-weight:700;color:#818cf8;letter-spacing:2px">${r.roomCode}</span></td>
+        <td><span style="font-family:monospace;font-size:12px;color:#f59e0b;background:#422006;padding:2px 7px;border-radius:5px">${esc(r.plainPassword)}</span></td>
+        <td style="color:#94a3b8;font-size:12px">${r.owner ? esc(r.owner.name) : "—"}</td>
+        <td><span class="badge badge-blue">${r.memberCount}</span></td>
+        <td style="color:#64748b">${r.messageCount.toLocaleString()}</td>
+        <td>${r.onlineNow > 0 ? `<span class="badge badge-green"><span class="live-dot" style="width:5px;height:5px"></span>${r.onlineNow}</span>` : '<span style="color:#334155">0</span>'}</td>
+        <td style="color:#475569;font-size:12px">${fmtDate(r.createdAt)}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm-blue" onclick="viewMessages('${r.roomCode}','${esc(r.name)}')">💬 View</button>
+            <button class="btn btn-sm-red" onclick="deleteRoom('${r.roomCode}','${esc(r.name)}')">Delete</button>
+          </div>
+        </td>
+      </tr>`).join("");
+  } catch { tbody.innerHTML = "<tr><td colspan='9' class='empty'>Failed to load</td></tr>"; }
+}
+
+function deleteRoom(roomCode, name) {
+  showConfirmModal("🗑", "Delete Room?", `Permanently delete "${name}" and all its messages?`, async () => {
+    await fetch(`/api/admin/rooms/${roomCode}`, { method: "DELETE" });
+    loadRooms(document.getElementById("room-search").value);
+    loadStats();
+  });
+}
+
+// ══ MESSAGES VIEW ══
+async function viewMessages(roomCode, name) {
+  const panel = document.getElementById("msg-view-panel");
+  const box = document.getElementById("msg-view-box");
+  document.getElementById("msg-view-title").textContent = "# " + name + " (" + roomCode + ")";
+  box.innerHTML = "<div class='empty'>Loading…</div>";
+  panel.classList.add("open");
+  try {
+    const res = await fetch(`/api/admin/rooms/${roomCode}/messages`);
+    const { messages } = await res.json();
+    box.innerHTML = "";
+    if (!messages.length) { box.innerHTML = "<div class='empty'>No messages yet</div>"; return; }
+    messages.forEach(msg => {
+      const d = document.createElement("div");
+      if (msg.type === "system") {
+        d.className = "amsg amsg-sys";
+        d.textContent = msg.text;
+      } else {
+        d.className = "amsg amsg-user";
+        d.innerHTML = `<div class="aname">${esc(msg.username || "?")}</div><div>${esc(msg.text)}</div><div class="atime">${fmtTime(msg.timestamp)}</div>`;
+      }
+      box.appendChild(d);
+    });
+    box.scrollTop = box.scrollHeight;
+  } catch { box.innerHTML = "<div class='empty' style='color:#f87171'>Failed to load messages</div>"; }
+}
+
+function closeMsgView() { document.getElementById("msg-view-panel").classList.remove("open"); }
+
+// ══ ACTIVITY LOG ══
+async function loadActivity() {
+  const list = document.getElementById("activity-list");
+  list.innerHTML = "<div class='empty'>Loading…</div>";
+  try {
+    const res = await fetch("/api/admin/activity");
+    const { logs } = await res.json();
+    if (!logs.length) { list.innerHTML = "<div class='empty'>No activity yet</div>"; return; }
+    const colorMap = { BAN_USER:"#f87171", UNBAN_USER:"#4ade80", DELETE_USER:"#f87171", DELETE_ROOM:"#fb923c" };
+    list.innerHTML = logs.map(l => `
+      <div class="log-item">
+        <div class="log-action" style="color:${colorMap[l.action]||'#94a3b8'}">${l.action.replace(/_/g," ")}</div>
+        <div class="log-detail">${esc(l.targetName || "")} ${l.detail ? "· " + esc(l.detail) : ""}</div>
+        <div class="log-time">${fmtTime(l.timestamp)}</div>
+      </div>`).join("");
+  } catch { list.innerHTML = "<div class='empty' style='color:#f87171'>Failed to load</div>"; }
+}
+
+// ══ MODALS ══
+function openModal(id) { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+document.querySelectorAll(".modal-bg").forEach(m => m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); }));
+
+let confirmCallback = null;
+function showConfirmModal(icon, title, desc, cb) {
+  document.getElementById("modal-confirm-icon").textContent = icon;
+  document.getElementById("modal-confirm-title").textContent = title;
+  document.getElementById("modal-confirm-desc").textContent = desc;
+  confirmCallback = cb;
+  document.getElementById("modal-confirm-ok").onclick = () => { closeModal("modal-confirm"); cb(); };
+  openModal("modal-confirm");
+}
+
+// ══ UTILS ══
+function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmtDate(ts) { return new Date(ts).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}); }
+function fmtTime(ts) { return new Date(ts).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }
+</script>
+</body>
+</html>
