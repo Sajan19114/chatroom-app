@@ -71,6 +71,7 @@ function safeRoom(room, userId) {
     memberCount: room.members.length,
     pinnedMessage: room.pinnedMessage,
     createdAt: room.createdAt,
+    plainPassword: room.owner.toString() === userId.toString() ? room.plainPassword : undefined,
   };
 }
 
@@ -145,7 +146,7 @@ app.post("/api/rooms/create", authMiddleware, async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const room = await Room.create({
-      roomCode, name, passwordHash,
+      roomCode, name, passwordHash, plainPassword: password,
       owner: req.userId,
       members: [req.userId]
     });
