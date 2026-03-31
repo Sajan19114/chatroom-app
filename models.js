@@ -47,6 +47,7 @@ const messageSchema = new mongoose.Schema({
   text:        { type: String, required: true, maxlength: 2000 },
   deleted:     { type: Boolean, default: false },
   pinned:      { type: Boolean, default: false },
+  reactions:   [{ emoji: String, userId: String, username: String }],
   timestamp:   { type: Date, default: Date.now }
 });
 

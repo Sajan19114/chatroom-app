@@ -414,6 +414,29 @@ io.on("connection", (socket) => {
     io.to(roomCode).emit("message_deleted", { messageId });
   });
 
+  // ── Reactions ──────────────────────────────────────────────────────────────
+  socket.on("toggle_reaction", async ({ messageId, roomCode, emoji }) => {
+    if (!messageId || !roomCode || !emoji) return;
+    const msg = await Message.findById(messageId);
+    if (!msg || msg.type === "system") return;
+
+    const userId = socket.user._id.toString();
+    const existing = msg.reactions.findIndex(r => r.userId === userId && r.emoji === emoji);
+
+    if (existing > -1) {
+      msg.reactions.splice(existing, 1); // remove reaction
+    } else {
+      msg.reactions.push({ emoji, userId, username: socket.user.name }); // add reaction
+    }
+    await msg.save();
+
+    // Broadcast updated reactions to entire room
+    io.to(roomCode).emit("reaction_updated", {
+      messageId,
+      reactions: msg.reactions
+    });
+  });
+
   socket.on("typing_start", ({ roomCode }) => socket.to(roomCode).emit("user_typing", { username: socket.user.name }));
   socket.on("typing_stop",  ({ roomCode }) => socket.to(roomCode).emit("user_stop_typing", { username: socket.user.name }));
 
