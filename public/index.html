@@ -41,6 +41,12 @@
     .bubble-theirs{background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px}
     .bubble.pinned-bubble{border:2px solid #f59e0b}
     .msg-system{text-align:center;font-size:12px;color:#475569;padding:3px 0}
+    /* Reactions */
+    .reactions-row{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+    .reaction-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:3px 8px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:background .15s;user-select:none}
+    .reaction-pill:hover{background:rgba(255,255,255,.15)}
+    .reaction-pill.mine{background:rgba(99,102,241,.35);border-color:#6366f1}
+    .reaction-pill .rcount{font-size:11px;font-weight:600;color:#cbd5e1}
     /* Input */
     #msg-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:22px;padding:10px 16px;color:#f1f5f9;font-size:14px;outline:none;resize:none;max-height:120px;line-height:1.4}
     #msg-input:focus{border-color:#6366f1}
@@ -287,6 +293,15 @@
 
 <!-- Context Menu (long press) -->
 <div id="ctx-menu">
+  <!-- Emoji reaction row -->
+  <div style="display:flex;gap:2px;padding:6px 8px 8px;border-bottom:1px solid #334155;margin-bottom:4px">
+    <span style="font-size:20px;cursor:pointer;padding:3px 5px;border-radius:6px;transition:background .1s" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background=''" onclick="ctxReact('👍')">👍</span>
+    <span style="font-size:20px;cursor:pointer;padding:3px 5px;border-radius:6px;transition:background .1s" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background=''" onclick="ctxReact('❤️')">❤️</span>
+    <span style="font-size:20px;cursor:pointer;padding:3px 5px;border-radius:6px;transition:background .1s" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background=''" onclick="ctxReact('😂')">😂</span>
+    <span style="font-size:20px;cursor:pointer;padding:3px 5px;border-radius:6px;transition:background .1s" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background=''" onclick="ctxReact('😮')">😮</span>
+    <span style="font-size:20px;cursor:pointer;padding:3px 5px;border-radius:6px;transition:background .1s" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background=''" onclick="ctxReact('😢')">😢</span>
+    <span style="font-size:20px;cursor:pointer;padding:3px 5px;border-radius:6px;transition:background .1s" onmouseenter="this.style.background='#334155'" onmouseleave="this.style.background=''" onclick="ctxReact('🔥')">🔥</span>
+  </div>
   <div class="ctx-item" id="ctx-copy" onclick="ctxCopy()">📋 Copy message</div>
   <div class="ctx-item" id="ctx-pin" onclick="ctxPin()">📌 Pin message</div>
   <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">🗑 Delete message</div>
@@ -524,6 +539,15 @@ function connectSocket() {
     if (el) el.remove();
   });
 
+  // Reactions live update
+  socket.on("reaction_updated", ({ messageId, reactions }) => {
+    const rrow = document.getElementById("react-" + messageId);
+    if (!rrow) return;
+    rrow.innerHTML = reactions.length > 0
+      ? buildReactionPills(reactions, messageId, currentRoom?.roomCode)
+      : "";
+  });
+
   socket.on("room_update", ({ userCount, users }) => {
     document.getElementById("chat-user-count").textContent = userCount;
     document.getElementById("chat-online").textContent = userCount + " online";
@@ -641,8 +665,42 @@ function renderMessage(msg) {
   bubble.addEventListener("touchend", () => clearTimeout(longPressTimer));
   bubble.addEventListener("touchmove", () => clearTimeout(longPressTimer));
 
-  wrapper.appendChild(bubble);
+  // Bubble column wrapper (bubble + reactions stacked)
+  const col = document.createElement("div");
+  col.style.cssText = "display:flex;flex-direction:column;align-items:" + (isMine ? "flex-end" : "flex-start") + ";max-width:72%";
+  col.appendChild(bubble);
+
+  // Reactions row
+  const rrow = document.createElement("div");
+  rrow.id = "react-" + msg._id;
+  rrow.className = "reactions-row";
+  if (msg.reactions && msg.reactions.length > 0) {
+    rrow.innerHTML = buildReactionPills(msg.reactions, msg._id, msg.roomId);
+  }
+  col.appendChild(rrow);
+
+  wrapper.appendChild(col);
   box.appendChild(wrapper);
+}
+
+function buildReactionPills(reactions, msgId, roomId) {
+  // Group by emoji
+  const grouped = {};
+  reactions.forEach(r => {
+    if (!grouped[r.emoji]) grouped[r.emoji] = { count: 0, mine: false };
+    grouped[r.emoji].count++;
+    if (r.userId === currentUser?.id || r.username === currentUser?.name) grouped[r.emoji].mine = true;
+  });
+  return Object.entries(grouped).map(([emoji, { count, mine }]) =>
+    `<span class="reaction-pill ${mine ? 'mine' : ''}" onclick="toggleReaction('${msgId}','${roomId || currentRoom?.roomCode}','${emoji}')">
+      ${emoji} <span class="rcount">${count}</span>
+    </span>`
+  ).join("");
+}
+
+function toggleReaction(msgId, roomCode, emoji) {
+  if (!socket || !roomCode) return;
+  socket.emit("toggle_reaction", { messageId: msgId, roomCode, emoji });
 }
 
 function appendSystem(text) {
@@ -682,6 +740,12 @@ function closeCtxMenu() { document.getElementById("ctx-menu").classList.remove("
 function ctxCopy() {
   if (ctxTarget) navigator.clipboard?.writeText(ctxTarget.text).catch(() => {});
   closeCtxMenu();
+}
+
+function ctxReact(emoji) {
+  closeCtxMenu();
+  if (!ctxTarget || !currentRoom) return;
+  toggleReaction(ctxTarget._id, currentRoom.roomCode, emoji);
 }
 
 function ctxDelete() {
