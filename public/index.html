@@ -15,104 +15,62 @@
     .card{background:#1e293b;border-radius:16px;padding:2rem;width:100%;max-width:440px;border:1px solid #334155}
     .field{margin-bottom:14px}
     .field label{display:block;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
-    .field input,.field select,.field textarea{width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:11px 14px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s;resize:none}
-    .field input:focus,.field select:focus,.field textarea:focus{border-color:#6366f1}
+    .field input,.field select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:11px 14px;color:#f1f5f9;font-size:14px;outline:none;transition:border .2s}
+    .field input:focus,.field select:focus{border-color:#6366f1}
     .field select option{background:#1e293b}
     .btn-primary{width:100%;background:#6366f1;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:6px}
     .btn-primary:hover{background:#818cf8}
-    .btn-danger{width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
+    .btn-danger{width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:6px}
     .btn-danger:hover{background:#ef4444}
     .btn-ghost{background:none;border:1px solid #334155;border-radius:8px;padding:7px 14px;color:#94a3b8;cursor:pointer;font-size:13px;transition:all .15s;white-space:nowrap}
     .btn-ghost:hover{border-color:#6366f1;color:#6366f1}
     .err{color:#f87171;font-size:13px;margin-top:8px;display:none;padding:8px 12px;background:#450a0a;border-radius:8px;border:1px solid #7f1d1d}
-    .avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase;position:relative}
-    /* Status dot on avatar */
-    .status-dot{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;border:2px solid #0f172a}
-    .status-online{background:#10b981}
-    .status-away{background:#f59e0b}
-    .status-busy{background:#ef4444}
-    .status-offline{background:#475569}
+    .avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0;text-transform:uppercase}
     /* Chat layout */
     #chat-header{background:#0f172a;border-bottom:1px solid #1e293b;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:10}
-    #chat-box{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:4px;min-height:0}
+    #chat-box{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:6px;min-height:0}
     #chat-bottom{flex-shrink:0;background:#0f172a;border-top:1px solid #1e293b}
     #typing-bar{min-height:18px;font-size:12px;color:#94a3b8;padding:4px 1rem 0;font-style:italic}
     #input-row{padding:8px 12px 14px;display:flex;gap:8px;align-items:flex-end}
-    /* Reply preview */
-    #reply-preview{display:none;padding:8px 14px;background:#1e293b;border-left:3px solid #6366f1;margin:0 12px 4px;border-radius:0 8px 8px 0;align-items:center;gap:8px}
-    #reply-preview.visible{display:flex}
-    /* Announcement bar */
-    #announce-bar{background:#1a1f35;border-bottom:1px solid #2d3756;padding:7px 14px;display:none;align-items:center;gap:8px;flex-shrink:0}
-    #announce-bar.visible{display:flex}
-    /* Pinned bar */
-    #pinned-bar{background:#1e293b;border-bottom:1px solid #334155;padding:8px 14px;display:none;align-items:center;gap:8px;flex-shrink:0}
-    #pinned-bar.visible{display:flex}
-    /* Search bar */
-    #search-bar{background:#0f172a;border-bottom:1px solid #1e293b;padding:8px 14px;display:none;flex-shrink:0;gap:8px;align-items:center}
-    #search-bar.visible{display:flex}
-    #search-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:22px;padding:8px 14px;color:#f1f5f9;font-size:14px;outline:none}
-    #search-input:focus{border-color:#6366f1}
-    #search-results{position:absolute;top:0;left:0;right:0;bottom:0;background:#0f172a;z-index:5;overflow-y:auto;padding:1rem;display:none;flex-direction:column;gap:6px}
-    #search-results.visible{display:flex}
     /* Bubbles */
-    .bubble-wrap{display:flex;align-items:flex-end;gap:7px;margin-bottom:2px}
+    .bubble-wrap{display:flex;align-items:flex-end;gap:7px}
     .bubble{max-width:72%;padding:9px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;position:relative;cursor:pointer;user-select:none}
-    .bubble .btime{font-size:11px;opacity:.5;margin-top:3px;display:flex;align-items:center;gap:4px}
+    .bubble .btime{font-size:11px;opacity:.5;margin-top:3px;display:block}
     .bubble .bname{font-size:11px;font-weight:600;margin-bottom:2px;opacity:.8;display:block}
     .bubble-mine{background:#6366f1;color:#fff;border-bottom-right-radius:4px}
     .bubble-theirs{background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px}
     .bubble.pinned-bubble{border:2px solid #f59e0b}
     .msg-system{text-align:center;font-size:12px;color:#475569;padding:3px 0}
-    /* Reply quote inside bubble */
-    .reply-quote{background:rgba(0,0,0,.2);border-left:3px solid rgba(255,255,255,.4);border-radius:4px;padding:5px 8px;margin-bottom:6px;font-size:12px;opacity:.8}
-    .reply-quote .rq-name{font-weight:600;margin-bottom:1px}
-    .reply-quote .rq-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-    /* Reactions */
-    .reactions-row{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
-    .reaction-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:2px 7px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:3px;transition:background .1s}
-    .reaction-pill:hover{background:rgba(255,255,255,.2)}
-    .reaction-pill.mine{background:rgba(99,102,241,.3);border-color:#6366f1}
-    /* Read receipt tick */
-    .tick{font-size:11px;opacity:.6}
-    .tick.seen{color:#60a5fa;opacity:1}
     /* Input */
     #msg-input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:22px;padding:10px 16px;color:#f1f5f9;font-size:14px;outline:none;resize:none;max-height:120px;line-height:1.4}
     #msg-input:focus{border-color:#6366f1}
     #send-btn{background:#6366f1;border:none;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
     #send-btn:hover{background:#818cf8}
-    /* Users panel */
+    /* Pinned bar */
+    #pinned-bar{background:#1e293b;border-bottom:1px solid #334155;padding:8px 14px;display:none;align-items:center;gap:8px;flex-shrink:0}
+    #pinned-bar.visible{display:flex}
+    /* Panels */
     #users-panel{position:absolute;top:calc(100% + 4px);right:12px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px;min-width:200px;z-index:50;display:none;box-shadow:0 8px 32px rgba(0,0,0,.6);max-height:300px;overflow-y:auto}
     #users-panel.open{display:block}
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
     .overlay.open{display:flex}
-    .room-chip{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border .15s;position:relative}
+    /* Room chips */
+    .room-chip{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border .15s}
     .room-chip:hover{border-color:#6366f1}
-    /* Unread badge */
-    .unread-badge{position:absolute;top:10px;right:12px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center}
-    /* Muted icon */
-    .muted-icon{position:absolute;bottom:10px;right:12px;font-size:13px;opacity:.5}
+    /* Tabs */
     .tab{padding:8px 0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s;flex:1;text-align:center}
     .tab.active{background:#1e293b;color:#f1f5f9}
     /* Context menu */
-    #ctx-menu{position:fixed;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);min-width:170px}
+    #ctx-menu{position:fixed;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);min-width:160px}
     #ctx-menu.open{display:block}
     .ctx-item{padding:9px 14px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:8px;transition:background .1s}
     .ctx-item:hover{background:#334155}
-    .ctx-item.danger{color:#f87171}.ctx-item.danger:hover{background:#450a0a}
-    /* Emoji picker */
-    #emoji-picker{position:fixed;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:8px;z-index:210;display:none;gap:4px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
-    #emoji-picker.open{display:flex}
-    .ep-emoji{font-size:20px;cursor:pointer;padding:4px 6px;border-radius:6px;transition:background .1s}
-    .ep-emoji:hover{background:#334155}
-    /* Code badge */
+    .ctx-item.danger{color:#f87171}
+    .ctx-item.danger:hover{background:#450a0a}
+    /* Room code badge */
     .code-badge{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-family:monospace;font-size:18px;font-weight:700;letter-spacing:4px;color:#818cf8;text-align:center}
+    /* Confirm dialog */
     .confirm-card{background:#1e293b;border-radius:16px;padding:1.5rem;width:100%;max-width:340px;border:1px solid #334155;text-align:center}
-    /* Category badge */
-    .cat-badge{font-size:11px;padding:2px 7px;border-radius:5px;background:#1e293b;border:1px solid #334155;color:#94a3b8}
-    /* Status selector */
-    .status-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;transition:background .1s}
-    .status-opt:hover{background:#334155}
-    .status-opt.selected{background:#1e3a5f}
   </style>
 </head>
 <body>
@@ -161,12 +119,10 @@
 <div id="screen-rooms" class="screen">
   <div style="background:#0f172a;border-bottom:1px solid #1e293b;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
     <div style="display:flex;align-items:center;gap:10px">
-      <div id="hdr-avatar" class="avatar" style="width:36px;height:36px;font-size:13px;cursor:pointer" onclick="openProfile()">
-        <div id="hdr-status-dot" class="status-dot status-online"></div>
-      </div>
+      <div id="hdr-avatar" class="avatar" style="width:36px;height:36px;font-size:13px"></div>
       <div>
         <div id="hdr-name" style="font-weight:600;font-size:15px"></div>
-        <div id="hdr-status-text" style="font-size:12px;color:#64748b">Online</div>
+        <div style="font-size:12px;color:#64748b">Your rooms</div>
       </div>
     </div>
     <div style="display:flex;gap:8px">
@@ -176,21 +132,16 @@
   </div>
   <div style="flex:1;overflow-y:auto;padding:1.25rem;min-height:0">
     <div style="max-width:600px;width:100%;margin:0 auto">
-      <!-- Filter by category -->
-      <div id="cat-filter" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px">
-        <button class="cat-btn active" data-cat="" onclick="filterCat(this,'')">All</button>
-        <button class="cat-btn" data-cat="general" onclick="filterCat(this,'general')">💬 General</button>
-        <button class="cat-btn" data-cat="study" onclick="filterCat(this,'study')">📚 Study</button>
-        <button class="cat-btn" data-cat="work" onclick="filterCat(this,'work')">💼 Work</button>
-        <button class="cat-btn" data-cat="friends" onclick="filterCat(this,'friends')">👫 Friends</button>
-        <button class="cat-btn" data-cat="gaming" onclick="filterCat(this,'gaming')">🎮 Gaming</button>
-        <button class="cat-btn" data-cat="other" onclick="filterCat(this,'other')">🏷️ Other</button>
-      </div>
-      <style>.cat-btn{background:#1e293b;border:1px solid #334155;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:#94a3b8;cursor:pointer;white-space:nowrap;transition:all .15s}.cat-btn.active,.cat-btn:hover{background:#6366f1;color:#fff;border-color:#6366f1}</style>
+      <!-- Actions -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem">
-        <button onclick="openCreateRoom()" style="background:#6366f1;border:none;border-radius:12px;padding:14px;color:#fff;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">➕ Create Room</button>
-        <button onclick="openJoinRoom()" style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#f1f5f9;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">🔑 Join Room</button>
+        <button onclick="openCreateRoom()" style="background:#6366f1;border:none;border-radius:12px;padding:14px;color:#fff;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+          ➕ Create Room
+        </button>
+        <button onclick="openJoinRoom()" style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#f1f5f9;font-weight:600;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+          🔑 Join Room
+        </button>
       </div>
+      <!-- Room list -->
       <div id="rooms-loading" style="text-align:center;color:#475569;padding:2rem;font-size:14px">Loading rooms…</div>
       <div id="rooms-list" style="display:flex;flex-direction:column;gap:10px"></div>
       <div id="rooms-empty" style="display:none;text-align:center;padding:3rem 1rem">
@@ -204,6 +155,7 @@
 
 <!-- ══════ SCREEN 3 — CHAT ══════ -->
 <div id="screen-chat" class="screen">
+  <!-- Locked header -->
   <div id="chat-header">
     <div style="display:flex;align-items:center;gap:10px">
       <button onclick="leaveRoom()" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:22px;line-height:1;padding:0 6px 2px">‹</button>
@@ -215,8 +167,7 @@
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:5px;align-items:center">
-      <button class="btn-ghost" onclick="toggleSearch()" style="padding:6px 10px" title="Search">🔍</button>
+    <div style="display:flex;gap:6px;align-items:center">
       <button class="btn-ghost" onclick="toggleUsers()" style="padding:6px 10px">👥 <span id="chat-user-count">0</span></button>
       <button class="btn-ghost" onclick="openRoomInfo()" style="padding:6px 10px">ℹ️</button>
     </div>
@@ -226,49 +177,22 @@
     </div>
   </div>
 
-  <!-- Announcement bar -->
-  <div id="announce-bar">
-    <span style="font-size:14px">📢</span>
-    <div style="flex:1;min-width:0">
-      <div style="font-size:11px;color:#60a5fa;font-weight:600;margin-bottom:1px">Announcement</div>
-      <div id="announce-text" style="font-size:13px;color:#e2e8f0"></div>
-    </div>
-  </div>
-
-  <!-- Pinned bar -->
+  <!-- Pinned message bar -->
   <div id="pinned-bar">
     <span style="font-size:14px">📌</span>
     <div style="flex:1;min-width:0">
-      <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-bottom:1px">Pinned</div>
+      <div style="font-size:11px;color:#f59e0b;font-weight:600;margin-bottom:1px">Pinned message</div>
       <div id="pinned-text" style="font-size:13px;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
     </div>
     <button id="unpin-btn" style="display:none;background:none;border:none;color:#64748b;cursor:pointer;font-size:16px" onclick="unpinMessage()">✕</button>
   </div>
 
-  <!-- Search bar -->
-  <div id="search-bar">
-    <input id="search-input" placeholder="Search messages…" oninput="searchMessages(this.value)"/>
-    <button onclick="toggleSearch()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">✕</button>
-  </div>
+  <!-- Messages -->
+  <div id="chat-box"></div>
 
-  <!-- Messages + search results overlay -->
-  <div style="flex:1;position:relative;min-height:0">
-    <div id="chat-box"></div>
-    <div id="search-results">
-      <div style="font-size:12px;color:#64748b;margin-bottom:8px" id="search-count"></div>
-    </div>
-  </div>
-
-  <!-- Bottom bar -->
+  <!-- Locked bottom -->
   <div id="chat-bottom">
     <div id="typing-bar"></div>
-    <div id="reply-preview">
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;color:#818cf8;font-weight:600" id="reply-name"></div>
-        <div style="font-size:12px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="reply-text"></div>
-      </div>
-      <button onclick="clearReply()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">✕</button>
-    </div>
     <div id="input-row">
       <textarea id="msg-input" rows="1" placeholder="Type a message…" maxlength="2000"></textarea>
       <button id="send-btn" onclick="sendMessage()">
@@ -279,13 +203,13 @@
 </div>
 
 <!-- ══════ OVERLAYS ══════ -->
+
+<!-- Create Room -->
 <div id="overlay-create" class="overlay">
   <div class="card">
-    <h2 style="font-size:18px;font-weight:700;margin-bottom:20px">Create a Room</h2>
-    <div class="field"><label>Room Name</label><input id="cr-name" type="text" placeholder="e.g. Study Group" maxlength="40"/></div>
-    <div class="field"><label>Category</label>
-      <select id="cr-cat"><option value="general">💬 General</option><option value="study">📚 Study</option><option value="work">💼 Work</option><option value="friends">👫 Friends</option><option value="gaming">🎮 Gaming</option><option value="other">🏷️ Other</option></select>
-    </div>
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Create a Room</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">A 6-digit code will be auto-generated</p>
+    <div class="field"><label>Room Name</label><input id="cr-name" type="text" placeholder="e.g. Study Group, Team Chat" maxlength="40"/></div>
     <div class="field"><label>Room Password</label><input id="cr-pass" type="password" placeholder="Min 4 characters"/></div>
     <div class="err" id="cr-err"></div>
     <button class="btn-primary" onclick="doCreateRoom()">Create Room →</button>
@@ -293,9 +217,11 @@
   </div>
 </div>
 
+<!-- Join Room -->
 <div id="overlay-join" class="overlay">
   <div class="card">
-    <h2 style="font-size:18px;font-weight:700;margin-bottom:20px">Join a Room</h2>
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Join a Room</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Ask the room owner for the 6-digit code</p>
     <div class="field"><label>Room Code</label><input id="jr-code" type="text" placeholder="6-digit code" maxlength="6" style="font-family:monospace;font-size:18px;letter-spacing:4px;text-align:center"/></div>
     <div class="field"><label>Room Password</label><input id="jr-pass" type="password" placeholder="Room password"/></div>
     <div class="err" id="jr-err"></div>
@@ -304,21 +230,19 @@
   </div>
 </div>
 
+<!-- Room Created Success -->
 <div id="overlay-created" class="overlay">
   <div class="card" style="text-align:center">
     <div style="font-size:36px;margin-bottom:12px">🎉</div>
     <h2 style="font-size:18px;font-weight:700;margin-bottom:6px">Room Created!</h2>
-    <p style="font-size:13px;color:#64748b;margin-bottom:16px">Share this code + password with friends</p>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">Share this code with people you want to invite</p>
     <div class="code-badge" id="new-room-code"></div>
-    <div style="margin:12px 0;display:flex;gap:8px">
-      <button onclick="copyInviteLink()" style="flex:1;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px;color:#94a3b8;cursor:pointer;font-size:13px">🔗 Copy Invite Link</button>
-      <button onclick="copyRoomCode()" style="flex:1;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:9px;color:#94a3b8;cursor:pointer;font-size:13px">📋 Copy Code</button>
-    </div>
+    <p style="font-size:12px;color:#475569;margin-top:8px;margin-bottom:20px">They'll also need the room password you set</p>
     <button class="btn-primary" onclick="enterCreatedRoom()">Enter Room →</button>
   </div>
 </div>
 
-<!-- Room Info overlay -->
+<!-- Room Info -->
 <div id="overlay-room-info" class="overlay">
   <div class="card" style="max-width:380px;max-height:80dvh;overflow-y:auto">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
@@ -329,26 +253,15 @@
   </div>
 </div>
 
-<!-- Profile overlay -->
+<!-- Profile -->
 <div id="overlay-profile" class="overlay">
-  <div class="card" style="max-width:400px;position:relative;max-height:90dvh;overflow-y:auto">
+  <div class="card" style="max-width:380px;position:relative">
     <button onclick="closeOverlay('overlay-profile')" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button>
     <div style="text-align:center;margin-bottom:1.5rem">
       <div id="profile-avatar" class="avatar" style="width:64px;height:64px;font-size:22px;margin:0 auto 10px"></div>
       <div id="profile-name-display" style="font-size:18px;font-weight:700"></div>
       <div id="profile-mobile-display" style="font-size:13px;color:#64748b"></div>
     </div>
-    <!-- Status selector -->
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Status</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-        <div class="status-opt" onclick="selectStatus('online')" id="sopt-online"><span class="status-dot status-online" style="position:relative;width:10px;height:10px;border:none"></span>Online</div>
-        <div class="status-opt" onclick="selectStatus('away')" id="sopt-away"><span class="status-dot status-away" style="position:relative;width:10px;height:10px;border:none"></span>Away</div>
-        <div class="status-opt" onclick="selectStatus('busy')" id="sopt-busy"><span class="status-dot status-busy" style="position:relative;width:10px;height:10px;border:none"></span>Busy</div>
-        <div class="status-opt" onclick="selectStatus('offline')" id="sopt-offline"><span class="status-dot status-offline" style="position:relative;width:10px;height:10px;border:none"></span>Offline</div>
-      </div>
-    </div>
-    <div class="field"><label>Status Message</label><input id="p-status-text" type="text" placeholder="e.g. In a meeting…" maxlength="60"/></div>
     <div class="field"><label>Full Name</label><input id="p-name" type="text" maxlength="40"/></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="field" style="margin:0"><label>Age</label><input id="p-age" type="number" min="10" max="120"/></div>
@@ -358,11 +271,10 @@
     </div>
     <div class="err" id="p-err"></div>
     <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
-    <button onclick="requestPushPermission()" id="push-btn" style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:11px;color:#94a3b8;cursor:pointer;font-size:14px;margin-top:8px">🔔 Enable Push Notifications</button>
   </div>
 </div>
 
-<!-- Confirm dialog -->
+<!-- Confirm Dialog -->
 <div id="overlay-confirm" class="overlay">
   <div class="confirm-card">
     <div style="font-size:32px;margin-bottom:12px" id="confirm-icon">⚠️</div>
@@ -373,764 +285,500 @@
   </div>
 </div>
 
-<!-- Context menu -->
+<!-- Context Menu (long press) -->
 <div id="ctx-menu">
-  <div style="display:flex;gap:2px;padding:4px 6px 6px;border-bottom:1px solid #334155;margin-bottom:4px" id="emoji-row">
-    <span class="ep-emoji" onclick="ctxReact('👍')">👍</span>
-    <span class="ep-emoji" onclick="ctxReact('❤️')">❤️</span>
-    <span class="ep-emoji" onclick="ctxReact('😂')">😂</span>
-    <span class="ep-emoji" onclick="ctxReact('😮')">😮</span>
-    <span class="ep-emoji" onclick="ctxReact('😢')">😢</span>
-    <span class="ep-emoji" onclick="ctxReact('🔥')">🔥</span>
-  </div>
-  <div class="ctx-item" onclick="ctxReply()">↩️ Reply</div>
-  <div class="ctx-item" onclick="ctxCopy()">📋 Copy</div>
-  <div class="ctx-item" id="ctx-pin" onclick="ctxPin()">📌 Pin</div>
-  <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">🗑 Delete</div>
-</div>
-
-<!-- Invite join page (shown when coming from /join/XXXXXX) -->
-<div id="overlay-invite" class="overlay">
-  <div class="card" style="text-align:center">
-    <div style="font-size:36px;margin-bottom:12px">🔗</div>
-    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px" id="invite-room-name"></h2>
-    <p style="font-size:13px;color:#64748b;margin-bottom:20px" id="invite-room-meta"></p>
-    <div class="field" style="text-align:left"><label>Room Password</label><input id="invite-pass" type="password" placeholder="Enter room password"/></div>
-    <div class="err" id="invite-err"></div>
-    <button class="btn-primary" onclick="doInviteJoin()">Join Room →</button>
-    <button onclick="closeOverlay('overlay-invite')" style="width:100%;background:none;border:none;color:#64748b;cursor:pointer;padding:10px;margin-top:6px;font-size:14px">Cancel</button>
-  </div>
+  <div class="ctx-item" id="ctx-copy" onclick="ctxCopy()">📋 Copy message</div>
+  <div class="ctx-item" id="ctx-pin" onclick="ctxPin()">📌 Pin message</div>
+  <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">🗑 Delete message</div>
 </div>
 
 <script>
 // ══ STATE ══
-let currentUser = null, socket = null, currentRoom = null;
-let typingTimer = null, isTyping = false;
+let currentUser = null;
+let socket = null;
+let currentRoom = null; // { roomCode, name, isOwner }
+let typingTimer = null;
+let isTyping = false;
 const typingUsers = new Set();
-let ctxTarget = null, longPressTimer = null;
-let replyTarget = null;
+let ctxTarget = null; // { messageId, text, isMine, timestamp }
 let createdRoomData = null;
-let selectedStatus = "online";
-let allRooms = [], activeCatFilter = "";
-let unreadCounts = {};
-let inviteRoomCode = null;
-let inviteRoomData = null;
-
-// ══ SOUND ══
-function playMsgSound() {
-  try {
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.05);
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.2);
-  } catch {}
-}
-
-// ══ PUSH NOTIFICATIONS ══
-async function requestPushPermission() {
-  try {
-    const perm = await Notification.requestPermission();
-    if (perm !== "granted") { alert("Notifications blocked. Please allow in browser settings."); return; }
-    if (!("serviceWorker" in navigator)) { alert("Push not supported in this browser"); return; }
-    const reg = await navigator.serviceWorker.register("/sw.js");
-    const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlBase64ToUint8Array("BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjZCeJjjm8dOz-pCkSSsMTjU9MVg==") });
-    await fetch("/api/push/subscribe", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ subscription:sub }) });
-    document.getElementById("push-btn").textContent = "✅ Notifications Enabled";
-    document.getElementById("push-btn").disabled = true;
-  } catch(e) { console.log("Push setup:", e.message); }
-}
-function urlBase64ToUint8Array(b64) {
-  const raw = atob(b64.replace(/-/g,"+").replace(/_/g,"/"));
-  return new Uint8Array([...raw].map(c=>c.charCodeAt(0)));
-}
-function showBrowserNotif(title, body) {
-  if (Notification.permission === "granted" && document.hidden) {
-    new Notification(title, { body, icon:"/icon.png" });
-  }
-}
+let longPressTimer = null;
 
 // ══ INIT ══
 (async () => {
-  // Check invite link
-  const path = window.location.pathname;
-  if (path.startsWith("/join/")) {
-    inviteRoomCode = path.split("/join/")[1];
-  }
   try {
     const res = await fetch("/api/me");
-    if (res.ok) {
-      const { user } = await res.json();
-      currentUser = user;
-      showRoomsScreen();
-      if (inviteRoomCode) handleInviteLink();
-    }
+    if (res.ok) { const { user } = await res.json(); currentUser = user; showRoomsScreen(); }
   } catch {}
 })();
 
 // ══ SCREENS ══
-function showScreen(id) { document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); }
-
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 function showRoomsScreen() {
   showScreen("screen-rooms");
   document.getElementById("hdr-name").textContent = currentUser.name;
   setAvatar("hdr-avatar", currentUser.initials, currentUser.avatarColor, 36);
-  updateStatusUI(currentUser.status, currentUser.statusText);
   connectSocket();
   loadRooms();
 }
-
 function showChatScreen(room) {
   currentRoom = room;
   showScreen("screen-chat");
   document.getElementById("chat-room-name").textContent = room.name;
   document.getElementById("room-code-small").textContent = "Code: " + room.roomCode;
-  document.getElementById("announce-bar").classList.remove("visible");
-  document.getElementById("pinned-bar").classList.remove("visible");
   document.getElementById("msg-input").focus();
-}
-
-function updateStatusUI(status, text) {
-  const dot = document.getElementById("hdr-status-dot");
-  dot.className = `status-dot status-${status||"online"}`;
-  const st = text || { online:"Online", away:"Away", busy:"Busy", offline:"Offline" }[status] || "Online";
-  document.getElementById("hdr-status-text").textContent = st;
+  // Reset pinned bar
+  document.getElementById("pinned-bar").classList.remove("visible");
 }
 
 // ══ AUTH ══
 function switchTab(tab) {
-  document.getElementById("form-login").style.display = tab==="login"?"block":"none";
-  document.getElementById("form-register").style.display = tab==="register"?"block":"none";
-  document.getElementById("tab-login").classList.toggle("active",tab==="login");
-  document.getElementById("tab-register").classList.toggle("active",tab==="register");
+  document.getElementById("form-login").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("form-register").style.display = tab === "register" ? "block" : "none";
+  document.getElementById("tab-login").classList.toggle("active", tab === "login");
+  document.getElementById("tab-register").classList.toggle("active", tab === "register");
 }
 async function doRegister() {
-  const body={name:v("r-name"),mobile:v("r-mobile"),password:v("r-pass"),age:v("r-age"),gender:v("r-gender")};
-  if (!body.name||!body.mobile||!body.password||!body.age||!body.gender) return showErr("r-err","Please fill in all fields");
+  const body = { name: v("r-name"), mobile: v("r-mobile"), password: v("r-pass"), age: v("r-age"), gender: v("r-gender") };
+  if (!body.name || !body.mobile || !body.password || !body.age || !body.gender) return showErr("r-err", "Please fill in all fields");
   try {
-    const res=await fetch("/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    const data=await res.json();
-    if (!res.ok) return showErr("r-err",data.error);
-    currentUser=data.user; showRoomsScreen();
-  } catch { showErr("r-err","Network error"); }
+    const res = await fetch("/api/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) return showErr("r-err", data.error);
+    currentUser = data.user; showRoomsScreen();
+  } catch { showErr("r-err", "Network error"); }
 }
 async function doLogin() {
-  const body={mobile:v("l-mobile"),password:v("l-pass")};
-  if (!body.mobile||!body.password) return showErr("l-err","Enter mobile and password");
+  const body = { mobile: v("l-mobile"), password: v("l-pass") };
+  if (!body.mobile || !body.password) return showErr("l-err", "Enter mobile and password");
   try {
-    const res=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    const data=await res.json();
-    if (!res.ok) return showErr("l-err",data.error);
-    currentUser=data.user; showRoomsScreen();
-  } catch { showErr("l-err","Network error"); }
+    const res = await fetch("/api/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) return showErr("l-err", data.error);
+    currentUser = data.user; showRoomsScreen();
+  } catch { showErr("l-err", "Network error"); }
 }
 async function doLogout() {
-  await fetch("/api/logout",{method:"POST"});
-  socket?.disconnect(); socket=null; currentUser=null; currentRoom=null;
+  await fetch("/api/logout", { method:"POST" });
+  socket?.disconnect(); socket = null; currentUser = null; currentRoom = null;
   showScreen("screen-auth");
-}
-
-// ══ INVITE LINK ══
-async function handleInviteLink() {
-  try {
-    const res = await fetch(`/api/rooms/invite/${inviteRoomCode}`);
-    if (!res.ok) { alert("Room not found or invalid link"); return; }
-    inviteRoomData = await res.json();
-    document.getElementById("invite-room-name").textContent = inviteRoomData.name;
-    document.getElementById("invite-room-meta").textContent = `${inviteRoomData.memberCount} members · Code: ${inviteRoomData.roomCode}`;
-    openOverlay("overlay-invite");
-  } catch {}
-}
-async function doInviteJoin() {
-  const password = v("invite-pass");
-  if (!password) return showErr("invite-err","Enter room password");
-  try {
-    const res=await fetch("/api/rooms/join",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({roomCode:inviteRoomCode,password})});
-    const data=await res.json();
-    if (!res.ok) return showErr("invite-err",data.error);
-    closeOverlay("overlay-invite");
-    history.replaceState(null,"","/");
-    loadRooms();
-    enterRoom(data.room);
-  } catch { showErr("invite-err","Server error"); }
 }
 
 // ══ ROOMS ══
 async function loadRooms() {
-  document.getElementById("rooms-loading").style.display="block";
-  document.getElementById("rooms-list").innerHTML="";
-  document.getElementById("rooms-empty").style.display="none";
+  document.getElementById("rooms-loading").style.display = "block";
+  document.getElementById("rooms-list").innerHTML = "";
+  document.getElementById("rooms-empty").style.display = "none";
   try {
-    const res=await fetch("/api/rooms");
-    const {rooms}=await res.json();
-    allRooms=rooms||[];
-    document.getElementById("rooms-loading").style.display="none";
-    renderRoomList();
-  } catch { document.getElementById("rooms-loading").textContent="Failed to load rooms"; }
-}
-
-function filterCat(el, cat) {
-  activeCatFilter=cat;
-  document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
-  renderRoomList();
-}
-
-function renderRoomList() {
-  const filtered = activeCatFilter ? allRooms.filter(r=>r.category===activeCatFilter) : allRooms;
-  const list=document.getElementById("rooms-list");
-  const empty=document.getElementById("rooms-empty");
-  if (!filtered.length) { empty.style.display="block"; list.innerHTML=""; return; }
-  empty.style.display="none";
-  const EMOJI={general:"💬",study:"📚",work:"💼",friends:"👫",gaming:"🎮",other:"🏷️"};
-  const muted=currentUser?.mutedRooms||[];
-  list.innerHTML=filtered.map(r=>{
-    const unread=unreadCounts[r.roomCode]||0;
-    const isMuted=muted.includes(r.roomCode);
-    return `<div class="room-chip" onclick="enterRoom(${JSON.stringify(r).replace(/"/g,'&quot;')})">
-      <div style="width:42px;height:42px;background:${r.isOwner?'#6366f1':'#1e293b'};border:1px solid #334155;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${r.isOwner?'👑':EMOJI[r.category||'general']}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">
-          ${esc(r.name)}
-          ${r.isOwner?'<span style="font-size:10px;background:#6366f1;color:#fff;padding:2px 6px;border-radius:4px">Owner</span>':''}
-          <span class="cat-badge">${EMOJI[r.category||'general']} ${r.category||'general'}</span>
+    const res = await fetch("/api/rooms");
+    const { rooms } = await res.json();
+    document.getElementById("rooms-loading").style.display = "none";
+    if (!rooms || rooms.length === 0) { document.getElementById("rooms-empty").style.display = "block"; return; }
+    document.getElementById("rooms-list").innerHTML = rooms.map(r => `
+      <div class="room-chip" onclick="enterRoom(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+        <div style="width:42px;height:42px;background:${r.isOwner ? '#6366f1' : '#1e293b'};border:1px solid #334155;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">
+          ${r.isOwner ? '👑' : '💬'}
         </div>
-        <div style="font-size:12px;color:#64748b;margin-top:2px">Code: <span style="font-family:monospace;color:#818cf8">${r.roomCode}</span> · ${r.memberCount} members</div>
-      </div>
-      ${unread>0&&!isMuted?`<span class="unread-badge">${unread>99?'99+':unread}</span>`:''}
-      ${isMuted?'<span class="muted-icon">🔇</span>':''}
-      <div style="color:#475569;font-size:18px">›</div>
-    </div>`;
-  }).join("");
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px">
+            ${esc(r.name)}
+            ${r.isOwner ? '<span style="font-size:10px;background:#6366f1;color:#fff;padding:2px 6px;border-radius:4px">Owner</span>' : ''}
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px">Code: <span style="font-family:monospace;color:#818cf8">${r.roomCode}</span> · ${r.memberCount} members</div>
+        </div>
+        <div style="color:#475569;font-size:18px">›</div>
+      </div>`).join("");
+  } catch { document.getElementById("rooms-loading").textContent = "Failed to load rooms"; }
 }
 
-function openCreateRoom() { document.getElementById("cr-name").value=""; document.getElementById("cr-pass").value=""; document.getElementById("cr-err").style.display="none"; openOverlay("overlay-create"); }
-function openJoinRoom() { document.getElementById("jr-code").value=""; document.getElementById("jr-pass").value=""; document.getElementById("jr-err").style.display="none"; openOverlay("overlay-join"); }
+function openCreateRoom() { document.getElementById("cr-name").value = ""; document.getElementById("cr-pass").value = ""; document.getElementById("cr-err").style.display = "none"; openOverlay("overlay-create"); }
+function openJoinRoom() { document.getElementById("jr-code").value = ""; document.getElementById("jr-pass").value = ""; document.getElementById("jr-err").style.display = "none"; openOverlay("overlay-join"); }
 
 async function doCreateRoom() {
-  const name=v("cr-name"),password=v("cr-pass"),category=v("cr-cat")||"general";
-  if (!name||!password) return showErr("cr-err","Name and password required");
-  if (password.length<4) return showErr("cr-err","Password min 4 characters");
+  const name = v("cr-name"), password = v("cr-pass");
+  if (!name || !password) return showErr("cr-err", "Room name and password required");
+  if (password.length < 4) return showErr("cr-err", "Password must be at least 4 characters");
   try {
-    const res=await fetch("/api/rooms/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,password,category})});
-    const data=await res.json();
-    if (!res.ok) return showErr("cr-err",data.error);
-    createdRoomData=data.room;
+    const res = await fetch("/api/rooms/create", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ name, password }) });
+    const data = await res.json();
+    if (!res.ok) return showErr("cr-err", data.error);
+    createdRoomData = data.room;
     closeOverlay("overlay-create");
-    document.getElementById("new-room-code").textContent=data.room.roomCode;
+    document.getElementById("new-room-code").textContent = data.room.roomCode;
     openOverlay("overlay-created");
     loadRooms();
-  } catch { showErr("cr-err","Server error"); }
-}
-async function doJoinRoom() {
-  const roomCode=v("jr-code"),password=v("jr-pass");
-  if (!roomCode||!password) return showErr("jr-err","Code and password required");
-  try {
-    const res=await fetch("/api/rooms/join",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({roomCode,password})});
-    const data=await res.json();
-    if (!res.ok) return showErr("jr-err",data.error);
-    closeOverlay("overlay-join"); loadRooms(); enterRoom(data.room);
-  } catch { showErr("jr-err","Server error"); }
+  } catch { showErr("cr-err", "Server error"); }
 }
 
-function copyInviteLink() {
-  if (!createdRoomData) return;
-  const url=`${location.origin}/join/${createdRoomData.roomCode}`;
-  navigator.clipboard?.writeText(url);
-  showToast("Invite link copied!");
+async function doJoinRoom() {
+  const roomCode = v("jr-code"), password = v("jr-pass");
+  if (!roomCode || !password) return showErr("jr-err", "Room code and password required");
+  try {
+    const res = await fetch("/api/rooms/join", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ roomCode, password }) });
+    const data = await res.json();
+    if (!res.ok) return showErr("jr-err", data.error);
+    closeOverlay("overlay-join");
+    loadRooms();
+    enterRoom(data.room);
+  } catch { showErr("jr-err", "Server error"); }
 }
-function copyRoomCode() {
-  if (!createdRoomData) return;
-  navigator.clipboard?.writeText(createdRoomData.roomCode);
-  showToast("Code copied!");
-}
-function enterCreatedRoom() { closeOverlay("overlay-created"); if(createdRoomData) enterRoom(createdRoomData); }
+
+function enterCreatedRoom() { closeOverlay("overlay-created"); if (createdRoomData) enterRoom(createdRoomData); }
 
 function enterRoom(room) {
-  document.getElementById("chat-box").innerHTML="";
-  document.getElementById("search-results").innerHTML="";
-  document.getElementById("search-results").classList.remove("visible");
-  document.getElementById("search-bar").classList.remove("visible");
-  clearReply();
+  document.getElementById("chat-box").innerHTML = "";
+  document.getElementById("pinned-bar").classList.remove("visible");
   showChatScreen(room);
-  socket.emit("join_room",{roomCode:room.roomCode});
-  unreadCounts[room.roomCode]=0;
-  renderRoomList();
+  socket.emit("join_room", { roomCode: room.roomCode });
 }
+
 function leaveRoom() {
-  if (currentRoom) socket.emit("mark_read",{roomCode:currentRoom.roomCode});
-  currentRoom=null;
-  document.getElementById("chat-box").innerHTML="";
-  showScreen("screen-rooms"); loadRooms();
+  currentRoom = null;
+  document.getElementById("chat-box").innerHTML = "";
+  showScreen("screen-rooms");
+  loadRooms();
 }
 
 // ══ ROOM INFO ══
 async function openRoomInfo() {
   if (!currentRoom) return;
   openOverlay("overlay-room-info");
-  document.getElementById("room-info-content").innerHTML='<div style="text-align:center;color:#64748b;padding:1rem">Loading…</div>';
+  document.getElementById("room-info-content").innerHTML = '<div style="text-align:center;color:#64748b;padding:1rem">Loading…</div>';
   try {
-    const res=await fetch(`/api/rooms/${currentRoom.roomCode}`);
-    const data=await res.json();
-    const r=data.room;
-    const created=new Date(r.createdAt).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
-    const isMuted=(currentUser?.mutedRooms||[]).includes(r.roomCode);
-    document.getElementById("room-info-content").innerHTML=`
+    const res = await fetch(`/api/rooms/${currentRoom.roomCode}`);
+    const data = await res.json();
+    const r = data.room;
+    const created = new Date(r.createdAt).toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" });
+    document.getElementById("room-info-content").innerHTML = `
       <div style="background:#0f172a;border-radius:10px;padding:12px;margin-bottom:14px">
         <div style="font-size:12px;color:#64748b;margin-bottom:4px">Room Code</div>
         <div class="code-badge">${r.roomCode}</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button onclick="copyRoomInvite('${r.roomCode}')" style="flex:1;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px;color:#94a3b8;cursor:pointer;font-size:12px">🔗 Invite Link</button>
-          <button onclick="toggleMuteRoom('${r.roomCode}')" id="mute-btn-info" style="flex:1;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:8px;color:#94a3b8;cursor:pointer;font-size:12px">${isMuted?'🔔 Unmute':'🔇 Mute'}</button>
-        </div>
+        <div style="font-size:12px;color:#475569;text-align:center;margin-top:6px">Share this code with friends</div>
       </div>
-      ${r.isOwner&&r.plainPassword?`
+      ${r.isOwner && r.plainPassword ? `
       <div style="background:#0f172a;border-radius:10px;padding:12px;margin-bottom:14px;border:1px solid #422006">
-        <div style="font-size:12px;color:#f59e0b;margin-bottom:6px;font-weight:600">🔑 Room Password <span style="font-size:10px;font-weight:400;color:#64748b">(owner only)</span></div>
+        <div style="font-size:12px;color:#f59e0b;margin-bottom:6px;font-weight:600">🔑 Room Password <span style="font-size:10px;font-weight:400;color:#64748b">(only visible to you)</span></div>
         <div style="display:flex;align-items:center;gap:8px">
-          <div style="flex:1;background:#1e293b;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:15px;letter-spacing:2px;color:#f1f5f9">${r.plainPassword}</div>
-          <button onclick="navigator.clipboard?.writeText('${r.plainPassword}')" style="background:#6366f1;border:none;border-radius:8px;padding:8px 12px;color:#fff;cursor:pointer;font-size:12px">📋</button>
+          <div id="pwd-display" style="flex:1;background:#1e293b;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:15px;letter-spacing:2px;color:#f1f5f9">${r.plainPassword}</div>
+          <button onclick="copyRoomPassword('${r.plainPassword}')" style="background:#6366f1;border:none;border-radius:8px;padding:8px 12px;color:#fff;cursor:pointer;font-size:12px;white-space:nowrap">📋 Copy</button>
         </div>
-      </div>`:''}
-      ${r.isOwner?`
-      <div style="margin-bottom:14px">
-        <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">📢 Announcement</div>
-        <textarea id="announce-input" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 12px;color:#f1f5f9;font-size:13px;outline:none;resize:none;height:70px">${esc(r.announcement||'')}</textarea>
-        <button onclick="saveAnnouncement()" style="width:100%;background:#1e3a5f;border:1px solid #1d4ed8;border-radius:8px;padding:8px;color:#60a5fa;cursor:pointer;font-size:13px;margin-top:6px">Save Announcement</button>
-      </div>`:''}
+        <div style="font-size:11px;color:#475569;margin-top:6px">Share both the code and password for others to join</div>
+      </div>` : ''}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-        <div style="background:#0f172a;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#818cf8">${data.messageCount}</div><div style="font-size:11px;color:#64748b">Messages</div></div>
-        <div style="background:#0f172a;border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:#10b981">${r.memberCount}</div><div style="font-size:11px;color:#64748b">Members</div></div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#818cf8">${data.messageCount}</div>
+          <div style="font-size:11px;color:#64748b">Messages</div>
+        </div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#10b981">${r.memberCount}</div>
+          <div style="font-size:11px;color:#64748b">Members</div>
+        </div>
       </div>
       <div style="font-size:12px;color:#475569;margin-bottom:10px">Created ${created}</div>
       <div style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Members</div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
-        ${data.members.map(m=>`
+        ${data.members.map(m => `
           <div style="display:flex;align-items:center;gap:8px">
             <div class="avatar" style="width:30px;height:30px;font-size:11px;background:${m.avatarColor}">${esc(m.initials)}</div>
             <span style="font-size:14px">${esc(m.name)}</span>
+            ${r.isOwner && m.id === data.members.find(x=>x)?.id ? '<span style="font-size:10px;background:#6366f1;color:#fff;padding:2px 6px;border-radius:4px;margin-left:auto">Owner</span>' : ''}
           </div>`).join("")}
       </div>
-      ${r.isOwner?`<button class="btn-danger" onclick="confirmDeleteRoom()">🗑 Delete Room</button>`:''}
+      ${r.isOwner ? `<button class="btn-danger" onclick="confirmDeleteRoom()">🗑 Delete Room</button>` : ''}
     `;
-  } catch { document.getElementById("room-info-content").innerHTML='<div style="color:#f87171">Failed to load</div>'; }
-}
-
-async function saveAnnouncement() {
-  const text=document.getElementById("announce-input")?.value?.trim()||"";
-  await fetch(`/api/rooms/${currentRoom.roomCode}/announcement`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
-  showToast("Announcement updated!");
-}
-
-async function toggleMuteRoom(roomCode) {
-  const res=await fetch(`/api/rooms/${roomCode}/mute`,{method:"POST"});
-  const {muted}=await res.json();
-  if (!currentUser.mutedRooms) currentUser.mutedRooms=[];
-  if (muted) { currentUser.mutedRooms.push(roomCode); }
-  else { currentUser.mutedRooms=currentUser.mutedRooms.filter(r=>r!==roomCode); }
-  document.getElementById("mute-btn-info").textContent=muted?'🔔 Unmute':'🔇 Mute';
-  renderRoomList();
-  showToast(muted?"Room muted":"Room unmuted");
-}
-
-function copyRoomInvite(code) {
-  navigator.clipboard?.writeText(`${location.origin}/join/${code}`);
-  showToast("Invite link copied!");
+  } catch { document.getElementById("room-info-content").innerHTML = '<div style="color:#f87171">Failed to load info</div>'; }
 }
 
 function confirmDeleteRoom() {
   closeOverlay("overlay-room-info");
-  showConfirm("⚠️","Delete Room?","This will permanently delete all messages.",async()=>{
-    await fetch(`/api/rooms/${currentRoom.roomCode}`,{method:"DELETE"});
-    leaveRoom();
+  showConfirm("⚠️", "Delete Room?", "This will permanently delete all messages and remove all members.", async () => {
+    try {
+      const res = await fetch(`/api/rooms/${currentRoom.roomCode}`, { method:"DELETE" });
+      if (res.ok) { leaveRoom(); }
+    } catch {}
   });
 }
 
 // ══ SOCKET ══
 function connectSocket() {
   if (socket?.connected) return;
-  socket=io(window.location.origin,{auth:{token:getCookie("token")}});
-  socket.on("connect",()=>console.log("✅ Socket connected"));
-  socket.on("connect_error",err=>console.error("Socket:",err.message));
-  socket.on("error_msg",msg=>showToast(msg,true));
+  socket = io(window.location.origin, { auth: { token: getCookie("token") } });
+  socket.on("connect", () => console.log("✅ Socket connected"));
+  socket.on("connect_error", err => console.error("Socket error:", err.message));
+  socket.on("error_msg", msg => alert(msg));
 
-  socket.on("chat_history",(messages)=>{
-    const box=document.getElementById("chat-box");
-    box.innerHTML="";
+  socket.on("chat_history", (messages) => {
+    const box = document.getElementById("chat-box");
+    box.innerHTML = "";
     messages.forEach(renderMessage);
     scrollBottom();
-    // mark read after loading
-    if (currentRoom) socket.emit("mark_read",{roomCode:currentRoom.roomCode});
   });
 
-  socket.on("new_message",(msg)=>{
-    renderMessage(msg); scrollBottom();
-    const isMine=msg.username===currentUser?.name;
-    const inRoom=currentRoom?.roomCode===msg.roomId;
-    const muted=(currentUser?.mutedRooms||[]).includes(msg.roomId);
-    if (!isMine&&msg.type==="user") {
-      if (!muted) playMsgSound();
-      if (!inRoom) {
-        unreadCounts[msg.roomId]=(unreadCounts[msg.roomId]||0)+1;
-        renderRoomList();
-      }
-      if (!muted) showBrowserNotif(`${msg.username} in ${msg.roomId}`,msg.text);
-    }
-    if (inRoom) socket.emit("mark_read",{roomCode:currentRoom.roomCode});
+  socket.on("new_message", (msg) => { renderMessage(msg); scrollBottom(); });
+
+  socket.on("message_deleted", ({ messageId }) => {
+    const el = document.getElementById("msg-" + messageId);
+    if (el) el.remove();
   });
 
-  socket.on("message_deleted",({messageId})=>{
-    document.getElementById("msg-"+messageId)?.remove();
-  });
-
-  socket.on("reaction_updated",({messageId,reactions})=>{
-    const el=document.getElementById("react-"+messageId);
-    if (el) el.innerHTML=renderReactions(reactions,messageId,true);
-  });
-
-  socket.on("messages_read",({userId,roomCode})=>{
-    if (roomCode!==currentRoom?.roomCode) return;
-    document.querySelectorAll(".tick[data-room='"+roomCode+"']").forEach(el=>{
-      el.classList.add("seen"); el.textContent="✓✓";
-    });
-  });
-
-  socket.on("room_update",({userCount,users})=>{
-    document.getElementById("chat-user-count").textContent=userCount;
-    document.getElementById("chat-online").textContent=userCount+" online";
-    document.getElementById("users-list").innerHTML=users.map(u=>`
+  socket.on("room_update", ({ userCount, users }) => {
+    document.getElementById("chat-user-count").textContent = userCount;
+    document.getElementById("chat-online").textContent = userCount + " online";
+    document.getElementById("users-list").innerHTML = users.map(u => `
       <div style="display:flex;align-items:center;gap:8px;font-size:13px">
-        <div class="avatar" style="width:26px;height:26px;font-size:10px;background:${u.avatarColor}">
-          ${esc(u.initials)}
-          <div class="status-dot status-${u.status||'online'}"></div>
-        </div>
+        <div class="avatar" style="width:26px;height:26px;font-size:10px;background:${u.avatarColor}">${esc(u.initials)}</div>
         <span>${esc(u.name)}</span>
-        <span style="font-size:11px;color:#475569;margin-left:auto">${u.status||'online'}</span>
       </div>`).join("");
   });
 
-  socket.on("announcement_updated",({text})=>{
-    const bar=document.getElementById("announce-bar");
-    if (text) { document.getElementById("announce-text").textContent=text; bar.classList.add("visible"); }
-    else { bar.classList.remove("visible"); }
-  });
-
-  socket.on("pin_updated",({pinnedMessage})=>{
-    document.querySelectorAll(".pinned-bubble").forEach(el=>el.classList.remove("pinned-bubble"));
-    const bar=document.getElementById("pinned-bar");
-    if (pinnedMessage&&!pinnedMessage.deleted) {
+  socket.on("pin_updated", ({ pinnedMessage }) => {
+    // Clear old pin styling
+    document.querySelectorAll(".pinned-bubble").forEach(el => el.classList.remove("pinned-bubble"));
+    const bar = document.getElementById("pinned-bar");
+    if (pinnedMessage && !pinnedMessage.deleted) {
       bar.classList.add("visible");
-      document.getElementById("pinned-text").textContent=pinnedMessage.username+": "+pinnedMessage.text;
-      document.getElementById("unpin-btn").style.display=currentRoom?.isOwner?"block":"none";
-      document.getElementById("msg-"+pinnedMessage._id)?.querySelector(".bubble")?.classList.add("pinned-bubble");
-    } else { bar.classList.remove("visible"); }
+      document.getElementById("pinned-text").textContent = pinnedMessage.username + ": " + pinnedMessage.text;
+      document.getElementById("unpin-btn").style.display = currentRoom?.isOwner ? "block" : "none";
+      const el = document.getElementById("msg-" + pinnedMessage._id);
+      if (el) el.querySelector(".bubble")?.classList.add("pinned-bubble");
+    } else {
+      bar.classList.remove("visible");
+    }
   });
 
-  socket.on("room_deleted",()=>{ alert("This room was deleted by the owner."); leaveRoom(); });
-  socket.on("user_status_changed",({userId,status,statusText,name})=>{ /* could update in users panel */ });
-  socket.on("user_typing",({username})=>{ typingUsers.add(username); updateTypingBar(); });
-  socket.on("user_stop_typing",({username})=>{ typingUsers.delete(username); updateTypingBar(); });
+  socket.on("room_deleted", () => {
+    alert("This room was deleted by the owner.");
+    leaveRoom();
+  });
+
+  socket.on("user_typing", ({ username }) => { typingUsers.add(username); updateTypingBar(); });
+  socket.on("user_stop_typing", ({ username }) => { typingUsers.delete(username); updateTypingBar(); });
 }
 
 // ══ MESSAGING ══
 function sendMessage() {
-  const input=document.getElementById("msg-input");
-  const text=input.value.trim();
-  if (!text||!socket||!currentRoom) return;
-  const payload={roomCode:currentRoom.roomCode,text};
-  if (replyTarget) { payload.replyTo={messageId:replyTarget.id,username:replyTarget.username,text:replyTarget.text}; }
-  socket.emit("send_message",payload);
-  input.value=""; input.style.height="auto";
-  clearReply(); stopTyping();
+  const input = document.getElementById("msg-input");
+  const text = input.value.trim();
+  if (!text || !socket || !currentRoom) return;
+  socket.emit("send_message", { roomCode: currentRoom.roomCode, text });
+  input.value = "";
+  input.style.height = "auto";
+  stopTyping();
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
-  const input=document.getElementById("msg-input");
-  input.addEventListener("input",()=>{
-    input.style.height="auto";
-    input.style.height=Math.min(input.scrollHeight,120)+"px";
-    if (!isTyping) { isTyping=true; socket?.emit("typing_start",{roomCode:currentRoom?.roomCode}); }
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("msg-input");
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+    if (!isTyping) { isTyping = true; socket?.emit("typing_start", { roomCode: currentRoom?.roomCode }); }
     clearTimeout(typingTimer);
-    typingTimer=setTimeout(stopTyping,1500);
+    typingTimer = setTimeout(stopTyping, 1500);
   });
-  input.addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();} });
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
 });
 
-function stopTyping() { if(isTyping){isTyping=false;socket?.emit("typing_stop",{roomCode:currentRoom?.roomCode});} }
+function stopTyping() {
+  if (isTyping) { isTyping = false; socket?.emit("typing_stop", { roomCode: currentRoom?.roomCode }); }
+}
 function updateTypingBar() {
-  const bar=document.getElementById("typing-bar");
-  const others=[...typingUsers].filter(u=>u!==currentUser?.name);
-  bar.textContent=others.length===0?"":(others.length===1?`${others[0]} is typing…`:`${others.length} people are typing…`);
-}
-
-// ══ SEARCH ══
-let searchTimer=null;
-function toggleSearch() {
-  const bar=document.getElementById("search-bar");
-  const results=document.getElementById("search-results");
-  const visible=bar.classList.contains("visible");
-  if (visible) { bar.classList.remove("visible"); results.classList.remove("visible"); results.innerHTML=""; }
-  else { bar.classList.add("visible"); document.getElementById("search-input").focus(); }
-}
-function searchMessages(q) {
-  clearTimeout(searchTimer);
-  if (!q||q.length<2) { document.getElementById("search-results").classList.remove("visible"); return; }
-  searchTimer=setTimeout(async()=>{
-    const res=await fetch(`/api/rooms/${currentRoom.roomCode}/search?q=${encodeURIComponent(q)}`);
-    const {messages}=await res.json();
-    const results=document.getElementById("search-results");
-    results.innerHTML=`<div style="font-size:12px;color:#64748b;margin-bottom:8px">${messages.length} result${messages.length!==1?'s':''} for "${esc(q)}"</div>`;
-    if (!messages.length) { results.innerHTML+='<div style="text-align:center;color:#475569;padding:2rem">No messages found</div>'; }
-    messages.forEach(msg=>{
-      const d=document.createElement("div");
-      d.style.cssText="background:#1e293b;border-radius:10px;padding:10px 12px;cursor:pointer";
-      d.innerHTML=`<div style="font-size:11px;color:#818cf8;font-weight:600;margin-bottom:3px">${esc(msg.username)}</div><div style="font-size:13px">${esc(msg.text)}</div><div style="font-size:11px;color:#475569;margin-top:3px">${formatTime(msg.timestamp)}</div>`;
-      results.appendChild(d);
-    });
-    results.classList.add("visible");
-  },400);
+  const bar = document.getElementById("typing-bar");
+  const others = [...typingUsers].filter(u => u !== currentUser?.name);
+  if (!others.length) { bar.textContent = ""; return; }
+  bar.textContent = others.length === 1 ? `${others[0]} is typing…` : `${others.length} people are typing…`;
 }
 
 // ══ RENDER ══
 function renderMessage(msg) {
-  if (msg.type==="system") { appendSystem(msg.text); return; }
-  const box=document.getElementById("chat-box");
-  const isMine=msg.username===currentUser?.name;
-  const wrapper=document.createElement("div");
-  wrapper.id="msg-"+msg._id;
-  wrapper.className="bubble-wrap";
-  if (isMine) wrapper.style.flexDirection="row-reverse";
+  if (msg.type === "system") { appendSystem(msg.text); return; }
+  const box = document.getElementById("chat-box");
+  const isMine = msg.senderId === currentUser?.id || msg.username === currentUser?.name;
+
+  const wrapper = document.createElement("div");
+  wrapper.id = "msg-" + msg._id;
+  wrapper.className = "bubble-wrap";
+  wrapper.style.cssText = isMine ? "flex-direction:row-reverse" : "";
 
   // Avatar
-  const av=document.createElement("div");
-  av.className="avatar";
-  av.style.cssText=`width:30px;height:30px;font-size:11px;background:${msg.avatarColor||"#6366f1"};flex-shrink:0`;
-  av.textContent=(msg.initials||msg.username||"?").charAt(0).toUpperCase();
+  const av = document.createElement("div");
+  av.className = "avatar";
+  av.style.cssText = `width:30px;height:30px;font-size:11px;background:${msg.avatarColor || "#6366f1"};flex-shrink:0`;
+  av.textContent = (msg.initials || msg.username || "?").charAt(0).toUpperCase();
   wrapper.appendChild(av);
 
-  const bwrap=document.createElement("div");
-  bwrap.style.cssText=`display:flex;flex-direction:column;align-items:${isMine?"flex-end":"flex-start"};max-width:72%`;
-
-  const bubble=document.createElement("div");
-  bubble.className=`bubble ${isMine?"bubble-mine":"bubble-theirs"}`;
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${isMine ? "bubble-mine" : "bubble-theirs"}`;
   if (msg.pinned) bubble.classList.add("pinned-bubble");
 
-  // Reply quote
-  if (msg.replyTo?.username) {
-    const rq=document.createElement("div");
-    rq.className="reply-quote";
-    rq.innerHTML=`<div class="rq-name">${esc(msg.replyTo.username)}</div><div class="rq-text">${esc(msg.replyTo.text)}</div>`;
-    bubble.appendChild(rq);
-  }
-
   if (!isMine) {
-    const nameEl=document.createElement("span");
-    nameEl.className="bname"; nameEl.textContent=msg.username;
+    const nameEl = document.createElement("span");
+    nameEl.className = "bname";
+    nameEl.textContent = msg.username;
     bubble.appendChild(nameEl);
   }
-
-  const textEl=document.createElement("span");
-  textEl.textContent=msg.text;
+  const textEl = document.createElement("span");
+  textEl.textContent = msg.text;
   bubble.appendChild(textEl);
 
-  // Time + read receipt
-  const timeEl=document.createElement("span");
-  timeEl.className="btime";
-  const age=Date.now()-new Date(msg.timestamp).getTime();
-  const canDel=isMine&&age<5*60*1000;
-  timeEl.innerHTML=`${formatTime(msg.timestamp)}${canDel?' · hold to delete':''}`;
-  if (isMine) {
-    const tick=document.createElement("span");
-    tick.className=`tick${(msg.readBy||[]).length>1?" seen":""}`;
-    tick.dataset.room=msg.roomId;
-    tick.textContent=(msg.readBy||[]).length>1?"✓✓":"✓";
-    timeEl.appendChild(tick);
-  }
+  const timeEl = document.createElement("span");
+  timeEl.className = "btime";
+  // Show delete timer if mine and within 5 min
+  const age = Date.now() - new Date(msg.timestamp).getTime();
+  const canDelete = isMine && age < 5 * 60 * 1000;
+  timeEl.textContent = formatTime(msg.timestamp) + (canDelete ? " · hold to delete" : "");
   bubble.appendChild(timeEl);
 
-  // Long press / right click
-  bubble.addEventListener("contextmenu",e=>{e.preventDefault();openCtxMenu(e,msg,isMine);});
-  bubble.addEventListener("touchstart",()=>{longPressTimer=setTimeout(()=>openCtxMenu(null,msg,isMine),600);},{passive:true});
-  bubble.addEventListener("touchend",()=>clearTimeout(longPressTimer));
-  bubble.addEventListener("touchmove",()=>clearTimeout(longPressTimer));
+  // Long press / right click for context menu
+  bubble.addEventListener("contextmenu", e => { e.preventDefault(); openCtxMenu(e, msg, isMine); });
+  bubble.addEventListener("touchstart", () => {
+    longPressTimer = setTimeout(() => openCtxMenu(null, msg, isMine), 600);
+  }, { passive: true });
+  bubble.addEventListener("touchend", () => clearTimeout(longPressTimer));
+  bubble.addEventListener("touchmove", () => clearTimeout(longPressTimer));
 
-  bwrap.appendChild(bubble);
-
-  // Reactions
-  if (msg.reactions&&msg.reactions.length>0) {
-    const rrow=document.createElement("div");
-    rrow.id="react-"+msg._id;
-    rrow.className="reactions-row";
-    rrow.innerHTML=renderReactions(msg.reactions,msg._id,false);
-    bwrap.appendChild(rrow);
-  } else {
-    const rrow=document.createElement("div");
-    rrow.id="react-"+msg._id;
-    rrow.className="reactions-row";
-    bwrap.appendChild(rrow);
-  }
-
-  wrapper.appendChild(bwrap);
+  wrapper.appendChild(bubble);
   box.appendChild(wrapper);
 }
 
-function renderReactions(reactions,msgId,inline) {
-  const grouped={};
-  reactions.forEach(r=>{ if(!grouped[r.emoji]) grouped[r.emoji]={count:0,mine:false}; grouped[r.emoji].count++; if(r.userId===currentUser?.id) grouped[r.emoji].mine=true; });
-  return Object.entries(grouped).map(([emoji,{count,mine}])=>
-    `<span class="reaction-pill ${mine?'mine':''}" onclick="quickReact('${msgId}','${currentRoom?.roomCode}','${emoji}')">${emoji} ${count}</span>`
-  ).join("");
-}
-
 function appendSystem(text) {
-  const box=document.getElementById("chat-box");
-  const d=document.createElement("div"); d.className="msg-system"; d.textContent=text;
+  const box = document.getElementById("chat-box");
+  const d = document.createElement("div");
+  d.className = "msg-system";
+  d.textContent = text;
   box.appendChild(d);
 }
-function scrollBottom() { const b=document.getElementById("chat-box"); b.scrollTop=b.scrollHeight; }
+function scrollBottom() { const box = document.getElementById("chat-box"); box.scrollTop = box.scrollHeight; }
 
 // ══ CONTEXT MENU ══
-function openCtxMenu(e,msg,isMine) {
-  ctxTarget=msg;
-  const menu=document.getElementById("ctx-menu");
-  const age=Date.now()-new Date(msg.timestamp).getTime();
-  document.getElementById("ctx-delete").style.display=isMine&&age<5*60*1000?"flex":"none";
-  document.getElementById("ctx-pin").style.display=currentRoom?.isOwner?"flex":"none";
-  document.getElementById("ctx-pin").childNodes[0].textContent=msg.pinned?"📌 Unpin ":"📌 Pin ";
-  if (e) { menu.style.left=Math.min(e.clientX,window.innerWidth-200)+"px"; menu.style.top=Math.min(e.clientY,window.innerHeight-200)+"px"; menu.style.transform=""; }
-  else { menu.style.left="50%"; menu.style.top="50%"; menu.style.transform="translate(-50%,-50%)"; }
+function openCtxMenu(e, msg, isMine) {
+  ctxTarget = msg;
+  const menu = document.getElementById("ctx-menu");
+  const age = Date.now() - new Date(msg.timestamp).getTime();
+  const canDelete = isMine && age < 5 * 60 * 1000;
+  const canPin = currentRoom?.isOwner;
+
+  document.getElementById("ctx-delete").style.display = canDelete ? "flex" : "none";
+  document.getElementById("ctx-pin").style.display = canPin ? "flex" : "none";
+  document.getElementById("ctx-pin").textContent = msg.pinned ? "📌 Unpin message" : "📌 Pin message";
+
+  if (e) {
+    menu.style.left = Math.min(e.clientX, window.innerWidth - 180) + "px";
+    menu.style.top = Math.min(e.clientY, window.innerHeight - 140) + "px";
+  } else {
+    menu.style.left = "50%";
+    menu.style.top = "50%";
+    menu.style.transform = "translate(-50%, -50%)";
+  }
   menu.classList.add("open");
 }
-function closeCtxMenu() { document.getElementById("ctx-menu").classList.remove("open"); document.getElementById("ctx-menu").style.transform=""; }
 
-function ctxReply() {
+function closeCtxMenu() { document.getElementById("ctx-menu").classList.remove("open"); document.getElementById("ctx-menu").style.transform = ""; }
+
+function ctxCopy() {
+  if (ctxTarget) navigator.clipboard?.writeText(ctxTarget.text).catch(() => {});
   closeCtxMenu();
-  if (!ctxTarget) return;
-  replyTarget={id:ctxTarget._id,username:ctxTarget.username,text:ctxTarget.text};
-  document.getElementById("reply-name").textContent=ctxTarget.username;
-  document.getElementById("reply-text").textContent=ctxTarget.text;
-  document.getElementById("reply-preview").classList.add("visible");
-  document.getElementById("msg-input").focus();
 }
-function clearReply() { replyTarget=null; document.getElementById("reply-preview").classList.remove("visible"); }
-
-function ctxCopy() { if(ctxTarget) navigator.clipboard?.writeText(ctxTarget.text); closeCtxMenu(); showToast("Copied!"); }
 
 function ctxDelete() {
   closeCtxMenu();
   if (!ctxTarget) return;
-  if (Date.now()-new Date(ctxTarget.timestamp).getTime()>5*60*1000) return showToast("5 min limit passed",true);
-  showConfirm("🗑","Delete Message?","This will remove it for everyone.",()=>{
-    socket.emit("delete_message",{messageId:ctxTarget._id,roomCode:currentRoom.roomCode});
+  const age = Date.now() - new Date(ctxTarget.timestamp).getTime();
+  if (age > 5 * 60 * 1000) return alert("Can only delete within 5 minutes of sending");
+  showConfirm("🗑", "Delete Message?", "This message will be removed for everyone.", () => {
+    socket.emit("delete_message", { messageId: ctxTarget._id, roomCode: currentRoom.roomCode });
   });
 }
+
 function ctxPin() {
   closeCtxMenu();
-  if (!ctxTarget||!currentRoom?.isOwner) return;
-  fetch(`/api/rooms/${currentRoom.roomCode}/pin`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messageId:ctxTarget._id})});
+  if (!ctxTarget || !currentRoom?.isOwner) return;
+  fetch(`/api/rooms/${currentRoom.roomCode}/pin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messageId: ctxTarget._id })
+  });
 }
-function ctxReact(emoji) {
-  closeCtxMenu();
-  if (!ctxTarget||!currentRoom) return;
-  quickReact(ctxTarget._id,currentRoom.roomCode,emoji);
-}
-function quickReact(msgId,roomCode,emoji) {
-  socket.emit("toggle_reaction",{messageId:msgId,roomCode,emoji});
-}
+
 function unpinMessage() {
-  if (!currentRoom?.isOwner) return;
-  const bar=document.getElementById("pinned-bar");
-  // get pinned msg id from DOM — find pinned bubble
-  const pinnedEl=document.querySelector(".pinned-bubble");
-  if (pinnedEl) {
-    const wrap=pinnedEl.closest("[id^='msg-']");
-    if (wrap) {
-      const mid=wrap.id.replace("msg-","");
-      fetch(`/api/rooms/${currentRoom.roomCode}/pin`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messageId:mid})});
-    }
+  if (!currentRoom?.isOwner || !ctxTarget) {
+    // Find current pinned from bar
+    fetch(`/api/rooms/${currentRoom.roomCode}/pin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messageId: document.getElementById("pinned-bar").dataset.msgId || "" })
+    });
   }
 }
 
-document.addEventListener("click",e=>{
+document.addEventListener("click", e => {
   if (!e.target.closest("#ctx-menu")) closeCtxMenu();
-  if (!e.target.closest("#users-panel")&&!e.target.closest(".btn-ghost")) document.getElementById("users-panel")?.classList.remove("open");
+  if (!e.target.closest("#users-panel") && !e.target.closest(".btn-ghost")) {
+    document.getElementById("users-panel")?.classList.remove("open");
+  }
 });
 
 // ══ OVERLAYS ══
 function openOverlay(id) { document.getElementById(id).classList.add("open"); }
 function closeOverlay(id) { document.getElementById(id).classList.remove("open"); }
-function showConfirm(icon,title,msg,cb) {
-  document.getElementById("confirm-icon").textContent=icon;
-  document.getElementById("confirm-title").textContent=title;
-  document.getElementById("confirm-msg").textContent=msg;
-  document.getElementById("confirm-ok").onclick=()=>{closeOverlay("overlay-confirm");cb();};
+
+function showConfirm(icon, title, msg, onConfirm) {
+  document.getElementById("confirm-icon").textContent = icon;
+  document.getElementById("confirm-title").textContent = title;
+  document.getElementById("confirm-msg").textContent = msg;
+  document.getElementById("confirm-ok").onclick = () => { closeOverlay("overlay-confirm"); onConfirm(); };
   openOverlay("overlay-confirm");
 }
 
 // ══ PROFILE ══
-let selectedStatusVal="online";
-function selectStatus(s) {
-  selectedStatusVal=s;
-  ["online","away","busy","offline"].forEach(x=>document.getElementById("sopt-"+x).classList.toggle("selected",x===s));
-}
 function openProfile() {
-  document.getElementById("p-name").value=currentUser.name;
-  document.getElementById("p-age").value=currentUser.age;
-  document.getElementById("p-gender").value=currentUser.gender;
-  document.getElementById("p-status-text").value=currentUser.statusText||"";
-  document.getElementById("profile-name-display").textContent=currentUser.name;
-  document.getElementById("profile-mobile-display").textContent="📱 "+currentUser.mobile;
-  setAvatar("profile-avatar",currentUser.initials,currentUser.avatarColor,64);
-  selectedStatusVal=currentUser.status||"online";
-  selectStatus(selectedStatusVal);
+  document.getElementById("p-name").value = currentUser.name;
+  document.getElementById("p-age").value = currentUser.age;
+  document.getElementById("p-gender").value = currentUser.gender;
+  document.getElementById("profile-name-display").textContent = currentUser.name;
+  document.getElementById("profile-mobile-display").textContent = "📱 " + currentUser.mobile;
+  setAvatar("profile-avatar", currentUser.initials, currentUser.avatarColor, 64);
   openOverlay("overlay-profile");
 }
 async function saveProfile() {
-  const body={name:v("p-name"),age:v("p-age"),gender:v("p-gender"),status:selectedStatusVal,statusText:v("p-status-text")};
-  if (!body.name||!body.age||!body.gender) return showErr("p-err","All fields required");
+  const body = { name: v("p-name"), age: v("p-age"), gender: v("p-gender") };
+  if (!body.name || !body.age || !body.gender) return showErr("p-err", "All fields required");
   try {
-    const res=await fetch("/api/profile",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    const data=await res.json();
-    if (!res.ok) return showErr("p-err",data.error);
-    currentUser=data.user;
-    setAvatar("hdr-avatar",currentUser.initials,currentUser.avatarColor,36);
-    document.getElementById("hdr-name").textContent=currentUser.name;
-    updateStatusUI(currentUser.status,currentUser.statusText);
-    socket?.emit("set_status",{status:selectedStatusVal,statusText:v("p-status-text")});
+    const res = await fetch("/api/profile", { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) return showErr("p-err", data.error);
+    currentUser = data.user;
+    setAvatar("hdr-avatar", currentUser.initials, currentUser.avatarColor, 36);
+    document.getElementById("hdr-name").textContent = currentUser.name;
     closeOverlay("overlay-profile");
-    showToast("Profile saved!");
-  } catch { showErr("p-err","Save failed"); }
+  } catch { showErr("p-err", "Save failed"); }
 }
 
 // ══ UTILS ══
-function toggleUsers() { document.getElementById("users-panel").classList.toggle("open"); }
-function v(id) { return document.getElementById(id)?.value?.trim()||""; }
-function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function formatTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); }
-function showErr(id,msg) { const el=document.getElementById(id); el.textContent=msg; el.style.display="block"; }
-function setAvatar(id,initials,color,size) {
-  const el=document.getElementById(id); if(!el) return;
-  el.textContent=(initials||"?").charAt(0).toUpperCase();
-  el.style.background=color||"#6366f1";
-  if (size) { el.style.width=size+"px"; el.style.height=size+"px"; el.style.fontSize=Math.round(size*.38)+"px"; }
+function copyRoomPassword(pwd) {
+  navigator.clipboard?.writeText(pwd).then(() => {
+    const btn = document.querySelector("#pwd-display + button");
+    if (btn) { btn.textContent = "✅ Copied"; setTimeout(() => btn.textContent = "📋 Copy", 2000); }
+  });
 }
-function getCookie(name) { return document.cookie.split(";").find(c=>c.trim().startsWith(name+"="))?.split("=")[1]||""; }
-
-// Toast notification
-let toastTimer=null;
-function showToast(msg,isErr=false) {
-  let toast=document.getElementById("toast");
-  if (!toast) { toast=document.createElement("div"); toast.id="toast"; toast.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid #334155;border-radius:20px;padding:8px 18px;font-size:13px;z-index:999;transition:opacity .3s;pointer-events:none"; document.body.appendChild(toast); }
-  toast.textContent=msg;
-  toast.style.borderColor=isErr?"#7f1d1d":"#334155";
-  toast.style.color=isErr?"#f87171":"#f1f5f9";
-  toast.style.opacity="1";
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>toast.style.opacity="0",2500);
+function toggleUsers() { document.getElementById("users-panel").classList.toggle("open"); }
+function v(id) { return document.getElementById(id)?.value?.trim() || ""; }
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function formatTime(ts) { return new Date(ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}); }
+function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = "block"; }
+function setAvatar(id, initials, color, size) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = (initials || "?").charAt(0).toUpperCase();
+  el.style.background = color || "#6366f1";
+  if (size) { el.style.width = size + "px"; el.style.height = size + "px"; el.style.fontSize = Math.round(size * .38) + "px"; }
+}
+function getCookie(name) {
+  return document.cookie.split(";").find(c => c.trim().startsWith(name + "="))?.split("=")[1] || "";
 }
 </script>
 </body>
