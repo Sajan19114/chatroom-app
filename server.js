@@ -18,7 +18,7 @@ const ADMIN_USERNAME = process.env.ADMIN_USERNAME  || "admin";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD  || "admin123";
 const PORT           = process.env.PORT            || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: "15mb" }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -326,7 +326,17 @@ app.delete("/api/admin/rooms/:roomCode", adminMiddleware, async (req, res) => {
 app.get("/api/admin/rooms/:roomCode/messages", adminMiddleware, async (req, res) => {
   try {
     const messages = await Message.find({ roomId: req.params.roomCode }).sort({ timestamp: 1 }).limit(500).lean();
-    res.json({ messages });
+    const light = messages.map(m => ({ ...m, hasMedia: !!m.mediaData, mediaData: undefined }));
+    res.json({ messages: light });
+  } catch { res.status(500).json({ error: "Server error" }); }
+});
+
+// Admin: fetch full media for a specific message
+app.get("/api/admin/messages/:messageId/media", adminMiddleware, async (req, res) => {
+  try {
+    const msg = await Message.findById(req.params.messageId);
+    if (!msg || !msg.mediaData) return res.status(404).json({ error: "No media" });
+    res.json({ mediaData: msg.mediaData, mediaMime: msg.mediaMime, mediaType: msg.mediaType });
   } catch { res.status(500).json({ error: "Server error" }); }
 });
 
@@ -336,6 +346,38 @@ app.get("/api/admin/activity", adminMiddleware, async (req, res) => {
     const logs = await Activity.find().sort({ timestamp: -1 }).limit(100);
     res.json({ logs });
   } catch { res.status(500).json({ error: "Server error" }); }
+});
+
+// ─── Media: view a 2-view message ────────────────────────────────────────────
+app.post("/api/messages/:messageId/view", authMiddleware, async (req, res) => {
+  try {
+    const msg = await Message.findById(req.params.messageId);
+    if (!msg || !msg.mediaData) return res.status(404).json({ error: "Not found" });
+
+    const userId = req.userId.toString();
+
+    if (msg.mediaMode === "2view") {
+      // Track unique viewers
+      if (!msg.viewedBy.includes(userId)) {
+        msg.viewedBy.push(userId);
+        msg.viewCount = (msg.viewCount || 0) + 1;
+        await msg.save();
+
+        // Once 2 unique users have viewed — delete media for everyone
+        if (msg.viewCount >= 2) {
+          msg.mediaData = null;
+          msg.deleted = true;
+          await msg.save();
+          // Notify room
+          io.to(msg.roomId).emit("message_deleted", { messageId: msg._id.toString() });
+          return res.json({ success: true, expired: true });
+        }
+      }
+    }
+
+    // Return media data
+    res.json({ success: true, mediaData: msg.mediaData, mediaMime: msg.mediaMime, mediaType: msg.mediaType, expired: false });
+  } catch (err) { console.error(err); res.status(500).json({ error: "Server error" }); }
 });
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
@@ -412,6 +454,39 @@ io.on("connection", (socket) => {
       io.to(roomCode).emit("pin_updated", { pinnedMessage: null });
     }
     io.to(roomCode).emit("message_deleted", { messageId });
+  });
+
+  // ── Media send ────────────────────────────────────────────────────────────
+  socket.on("send_media", async ({ roomCode, mediaData, mediaMime, mediaType, mediaMode, caption }) => {
+    if (!roomCode || !mediaData || !mediaMime) return;
+
+    // Size guard — max 8MB base64
+    if (mediaData.length > 11_000_000) {
+      return socket.emit("error_msg", "File too large. Max 8MB.");
+    }
+
+    const msg = await Message.create({
+      roomId: roomCode,
+      type: "user",
+      senderId: socket.user._id,
+      username: socket.user.name,
+      initials: socket.user.initials,
+      avatarColor: socket.user.avatarColor,
+      text: caption?.trim() || (mediaType === "video" ? "📹 Video" : "📷 Photo"),
+      mediaData,
+      mediaMime,
+      mediaType: mediaType || "image",
+      mediaMode: mediaMode || "permanent",
+      viewCount: 0,
+      viewedBy: [],
+    });
+
+    // Send to room WITHOUT the base64 data (too heavy for broadcast)
+    // Clients will fetch data on demand via REST
+    const msgLight = msg.toObject();
+    msgLight.mediaData = null; // strip data from socket broadcast
+    msgLight.hasMedia = true;
+    io.to(roomCode).emit("new_message", msgLight);
   });
 
   // ── Reactions ──────────────────────────────────────────────────────────────

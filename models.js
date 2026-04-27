@@ -48,6 +48,13 @@ const messageSchema = new mongoose.Schema({
   deleted:     { type: Boolean, default: false },
   pinned:      { type: Boolean, default: false },
   reactions:   [{ emoji: String, userId: String, username: String }],
+  // Media fields
+  mediaType:   { type: String, enum: ["image", "video", null], default: null },
+  mediaData:   { type: String, default: null },   // base64 data
+  mediaMime:   { type: String, default: null },   // e.g. image/jpeg
+  mediaMode:   { type: String, enum: ["permanent", "2view", null], default: null },
+  viewCount:   { type: Number, default: 0 },      // how many times opened (for 2view)
+  viewedBy:    [{ type: String }],                // userIds who opened (for 2view)
   timestamp:   { type: Date, default: Date.now }
 });
 
