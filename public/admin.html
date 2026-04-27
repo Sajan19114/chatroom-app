@@ -429,6 +429,22 @@ async function viewMessages(roomCode, name) {
       if (msg.type === "system") {
         d.className = "amsg amsg-sys";
         d.textContent = msg.text;
+      } else if (msg.hasMedia) {
+        d.className = "amsg amsg-user";
+        const typeLabel = msg.mediaType === "video" ? "🎬 Video" : "📷 Photo";
+        const modeLabel = msg.mediaMode === "2view" ? "2-view 🔒" : "Permanent";
+        const views = msg.viewCount || 0;
+        d.innerHTML = `
+          <div class="aname">${esc(msg.username || "?")}</div>
+          <div style="background:#0f172a;border-radius:8px;padding:8px 10px;margin:4px 0;display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px">${msg.mediaType === "video" ? "🎬" : "📷"}</span>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#94a3b8">${typeLabel} · ${modeLabel}</div>
+              <div style="font-size:11px;color:#475569">Views: ${views}</div>
+            </div>
+            <button onclick="adminViewMedia('${msg._id}','${msg.mediaType}')" style="margin-left:auto;background:#1e3a5f;border:1px solid #1d4ed8;border-radius:6px;padding:4px 10px;color:#60a5fa;cursor:pointer;font-size:12px">View</button>
+          </div>
+          <div class="atime">${fmtTime(msg.timestamp)}</div>`;
       } else {
         d.className = "amsg amsg-user";
         d.innerHTML = `<div class="aname">${esc(msg.username || "?")}</div><div>${esc(msg.text)}</div><div class="atime">${fmtTime(msg.timestamp)}</div>`;
@@ -475,6 +491,39 @@ function showConfirmModal(icon, title, desc, cb) {
 }
 
 // ══ UTILS ══
+async function adminViewMedia(msgId, mediaType) {
+  try {
+    const res = await fetch(`/api/admin/messages/${msgId}/media`);
+    const data = await res.json();
+    if (!res.ok) { alert("Media not available"); return; }
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px";
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "✕ Close";
+    closeBtn.style.cssText = "position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px";
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+    overlay.appendChild(closeBtn);
+    const src = `data:${data.mediaMime};base64,${data.mediaData}`;
+    if (data.mediaType === "video") {
+      const vid = document.createElement("video");
+      vid.src = src; vid.controls = true; vid.autoplay = true;
+      vid.style.cssText = "max-width:90vw;max-height:80vh;border-radius:10px";
+      overlay.appendChild(vid);
+    } else {
+      const img = document.createElement("img");
+      img.src = src;
+      img.style.cssText = "max-width:90vw;max-height:80vh;border-radius:10px;object-fit:contain";
+      overlay.appendChild(img);
+    }
+    const dlBtn = document.createElement("a");
+    dlBtn.href = src; dlBtn.download = `admin-media.${data.mediaMime?.split("/")[1]||"jpg"}`;
+    dlBtn.textContent = "⬇️ Download"; dlBtn.style.cssText = "color:#818cf8;font-size:14px;text-decoration:none;padding:8px 16px;background:#1e293b;border-radius:8px";
+    overlay.appendChild(dlBtn);
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", e => { if(e.target===overlay) document.body.removeChild(overlay); });
+  } catch { alert("Failed to load media"); }
+}
+
 function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function fmtDate(ts) { return new Date(ts).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}); }
 function fmtTime(ts) { return new Date(ts).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }

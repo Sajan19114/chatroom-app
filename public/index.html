@@ -34,7 +34,7 @@
     #input-row{padding:8px 12px 14px;display:flex;gap:8px;align-items:flex-end}
     /* Bubbles */
     .bubble-wrap{display:flex;align-items:flex-end;gap:7px}
-    .bubble{max-width:72%;padding:9px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;position:relative;cursor:pointer;user-select:none}
+    .bubble{max-width:88%;padding:9px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;position:relative;cursor:pointer;user-select:none}
     .bubble .btime{font-size:11px;opacity:.5;margin-top:3px;display:block}
     .bubble .bname{font-size:11px;font-weight:600;margin-bottom:2px;opacity:.8;display:block}
     .bubble-mine{background:#6366f1;color:#fff;border-bottom-right-radius:4px}
@@ -66,6 +66,18 @@
     /* Tabs */
     .tab{padding:8px 0;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s;flex:1;text-align:center}
     .tab.active{background:#1e293b;color:#f1f5f9}
+    /* Media */
+    .media-btn-wrap{position:relative}
+    .media-menu{position:absolute;bottom:calc(100% + 8px);left:0;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:8px;display:none;flex-direction:column;gap:4px;z-index:20;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+    .media-menu.open{display:flex}
+    .media-opt{padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px;transition:background .1s}
+    .media-opt:hover{background:#334155}
+    .media-bubble{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;min-width:180px}
+    .media-bubble:hover{background:#334155}
+    .media-bubble.expired{opacity:.45;cursor:default}
+    .media-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .media-icon.photo{background:#1e3a5f}
+    .media-icon.video{background:#1a2f1a}
     /* Context menu */
     #ctx-menu{position:fixed;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:6px;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);min-width:160px}
     #ctx-menu.open{display:block}
@@ -200,11 +212,23 @@
   <div id="chat-bottom">
     <div id="typing-bar"></div>
     <div id="input-row">
+      <div class="media-btn-wrap">
+        <button onclick="toggleMediaMenu()" style="background:#1e293b;border:1px solid #334155;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0" title="Send photo/video">📎</button>
+        <div class="media-menu" id="media-menu">
+          <div class="media-opt" onclick="pickMedia('image','permanent')">🖼️ Photo — Permanent</div>
+          <div class="media-opt" onclick="pickMedia('image','2view')">🔒 Photo — 2-Time View</div>
+          <div class="media-opt" onclick="pickMedia('video','permanent')">🎬 Video — Permanent</div>
+          <div class="media-opt" onclick="pickMedia('video','2view')">🔒 Video — 2-Time View</div>
+        </div>
+      </div>
       <textarea id="msg-input" rows="1" placeholder="Type a message…" maxlength="2000"></textarea>
       <button id="send-btn" onclick="sendMessage()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
+    <!-- Hidden file inputs -->
+    <input type="file" id="file-image" accept="image/*" style="display:none" onchange="onFileChosen('image')"/>
+    <input type="file" id="file-video" accept="video/*" style="display:none" onchange="onFileChosen('video')"/>
   </div>
 </div>
 
@@ -645,9 +669,55 @@ function renderMessage(msg) {
     nameEl.textContent = msg.username;
     bubble.appendChild(nameEl);
   }
-  const textEl = document.createElement("span");
-  textEl.textContent = msg.text;
-  bubble.appendChild(textEl);
+  // Media bubble — shown instead of plain text if hasMedia
+  if (msg.hasMedia || msg.mediaType) {
+    const isExpired = msg.deleted;
+    const is2view = msg.mediaMode === "2view";
+    const typeLabel = msg.mediaType === "video" ? "Video" : "Photo";
+    const typeIcon = msg.mediaType === "video" ? "🎬" : "📷";
+    const iconClass = msg.mediaType === "video" ? "video" : "photo";
+
+    const mediaBubble = document.createElement("div");
+    mediaBubble.className = "media-bubble" + (isExpired ? " expired" : "");
+
+    const iconEl = document.createElement("div");
+    iconEl.className = `media-icon ${iconClass}`;
+    iconEl.textContent = isExpired ? "🚫" : typeIcon;
+    mediaBubble.appendChild(iconEl);
+
+    const infoEl = document.createElement("div");
+    infoEl.style.cssText = "flex:1;min-width:0";
+    const titleEl = document.createElement("div");
+    titleEl.style.cssText = "font-weight:600;font-size:13px;margin-bottom:2px";
+    titleEl.textContent = isExpired ? `${typeLabel} expired` : (is2view ? `${typeLabel} · 2-view 🔒` : `${typeLabel} · Permanent`);
+    const subEl = document.createElement("div");
+    subEl.style.cssText = "font-size:11px;opacity:.6";
+    subEl.textContent = isExpired ? "This media has been viewed and deleted" : "Tap to open";
+    infoEl.appendChild(titleEl);
+    infoEl.appendChild(subEl);
+    mediaBubble.appendChild(infoEl);
+
+    if (!isExpired) {
+      mediaBubble.onclick = () => openMedia(msg._id, msg.mediaType);
+    }
+
+    bubble.appendChild(mediaBubble);
+
+    // Caption if any (only if different from default)
+    const defaultCaptions = ["📷 Photo", "📹 Video"];
+    if (msg.text && !defaultCaptions.includes(msg.text)) {
+      const capEl = document.createElement("span");
+      capEl.style.cssText = "display:block;margin-top:6px;font-size:13px";
+      capEl.textContent = msg.text;
+      bubble.appendChild(capEl);
+    }
+  } else {
+    const textEl = document.createElement("span");
+    textEl.textContent = msg.text;
+    bubble.appendChild(textEl);
+  }
+
+  const textEl = { textContent: "" }; // dummy so timeEl code below still works
 
   const timeEl = document.createElement("span");
   timeEl.className = "btime";
@@ -667,7 +737,7 @@ function renderMessage(msg) {
 
   // Bubble column wrapper (bubble + reactions stacked)
   const col = document.createElement("div");
-  col.style.cssText = "display:flex;flex-direction:column;align-items:" + (isMine ? "flex-end" : "flex-start") + ";max-width:72%";
+  col.style.cssText = "display:flex;flex-direction:column;align-items:" + (isMine ? "flex-end" : "flex-start") + ";max-width:88%;min-width:0";
   col.appendChild(bubble);
 
   // Reactions row
@@ -821,6 +891,90 @@ async function saveProfile() {
     closeOverlay("overlay-profile");
   } catch { showErr("p-err", "Save failed"); }
 }
+
+// ══ MEDIA ══
+let pendingMediaType = null;
+let pendingMediaMode = null;
+
+function toggleMediaMenu() {
+  const menu = document.getElementById("media-menu");
+  menu.classList.toggle("open");
+}
+
+function pickMedia(type, mode) {
+  document.getElementById("media-menu").classList.remove("open");
+  pendingMediaType = type;
+  pendingMediaMode = mode;
+  document.getElementById("file-" + type).click();
+}
+
+async function onFileChosen(type) {
+  const input = document.getElementById("file-" + type);
+  const file = input.files[0];
+  if (!file) return;
+  input.value = "";
+  if (file.size > 8 * 1024 * 1024) { alert("File too large. Max 8MB."); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const base64Full = e.target.result;
+    const mime = file.type;
+    const rawBase64 = base64Full.split(",")[1];
+    socket.emit("send_media", {
+      roomCode: currentRoom.roomCode,
+      mediaData: rawBase64,
+      mediaMime: mime,
+      mediaType: type,
+      mediaMode: pendingMediaMode,
+      caption: type === "video" ? "📹 Video" : "📷 Photo"
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+async function openMedia(messageId, mediaType) {
+  try {
+    const res = await fetch(`/api/messages/${messageId}/view`, { method: "POST" });
+    const data = await res.json();
+    if (!res.ok || data.expired) { alert("This media has expired and been deleted."); return; }
+
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px";
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "✕ Close";
+    closeBtn.style.cssText = "position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px";
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+    overlay.appendChild(closeBtn);
+
+    const src = `data:${data.mediaMime};base64,${data.mediaData}`;
+
+    if (data.mediaType === "video") {
+      const vid = document.createElement("video");
+      vid.src = src; vid.controls = true; vid.autoplay = true;
+      vid.style.cssText = "max-width:95vw;max-height:80vh;border-radius:10px";
+      overlay.appendChild(vid);
+    } else {
+      const img = document.createElement("img");
+      img.src = src;
+      img.style.cssText = "max-width:95vw;max-height:80vh;border-radius:10px;object-fit:contain";
+      overlay.appendChild(img);
+    }
+
+    const dlBtn = document.createElement("a");
+    dlBtn.href = src;
+    dlBtn.download = `media.${data.mediaMime?.split("/")[1] || "jpg"}`;
+    dlBtn.textContent = "⬇️ Download";
+    dlBtn.style.cssText = "color:#818cf8;font-size:14px;text-decoration:none;padding:8px 16px;background:#1e293b;border-radius:8px";
+    overlay.appendChild(dlBtn);
+
+    document.body.appendChild(overlay);
+    overlay.addEventListener("click", e => { if (e.target === overlay) document.body.removeChild(overlay); });
+  } catch { alert("Failed to load media."); }
+}
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".media-btn-wrap")) document.getElementById("media-menu")?.classList.remove("open");
+});
 
 // ══ UTILS ══
 function copyRoomPassword(pwd) {
