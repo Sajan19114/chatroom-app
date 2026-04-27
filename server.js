@@ -11,7 +11,10 @@ const { User, Room, Message, Activity } = require("./models");
 
 const app    = express();
 const server = http.createServer(app);
-const io     = new Server(server, { cors: { origin: "*" } });
+const io     = new Server(server, {
+  cors: { origin: "*" },
+  maxHttpBufferSize: 15 * 1024 * 1024  // 15MB — needed for image/video base64
+});
 
 const JWT_SECRET     = process.env.JWT_SECRET     || "dev_secret_change_in_prod";
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME  || "admin";
