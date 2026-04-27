@@ -215,10 +215,8 @@
       <div class="media-btn-wrap">
         <button onclick="toggleMediaMenu()" style="background:#1e293b;border:1px solid #334155;border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0" title="Send photo/video">📎</button>
         <div class="media-menu" id="media-menu">
-          <div class="media-opt" onclick="pickMedia('image','permanent')">🖼️ Photo — Permanent</div>
-          <div class="media-opt" onclick="pickMedia('image','2view')">🔒 Photo — 2-Time View</div>
-          <div class="media-opt" onclick="pickMedia('video','permanent')">🎬 Video — Permanent</div>
-          <div class="media-opt" onclick="pickMedia('video','2view')">🔒 Video — 2-Time View</div>
+          <div class="media-opt" onclick="pickMedia('image')">📷 Send Photo</div>
+          <div class="media-opt" onclick="pickMedia('video')">🎬 Send Video</div>
         </div>
       </div>
       <textarea id="msg-input" rows="1" placeholder="Type a message…" maxlength="2000"></textarea>
@@ -329,6 +327,41 @@
   <div class="ctx-item" id="ctx-copy" onclick="ctxCopy()">📋 Copy message</div>
   <div class="ctx-item" id="ctx-pin" onclick="ctxPin()">📌 Pin message</div>
   <div class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()">🗑 Delete message</div>
+</div>
+
+<!-- Media Preview Overlay -->
+<div id="media-preview-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:16px">
+  <div style="font-size:16px;font-weight:700;color:#f1f5f9">Preview</div>
+
+  <!-- Image preview -->
+  <img id="preview-img" src="" style="display:none;max-width:90vw;max-height:50vh;border-radius:12px;object-fit:contain"/>
+  <!-- Video preview -->
+  <video id="preview-vid" src="" controls style="display:none;max-width:90vw;max-height:50vh;border-radius:12px"></video>
+
+  <!-- Mode selector -->
+  <div style="display:flex;gap:10px">
+    <button id="mode-permanent" onclick="selectMode('permanent')" style="flex:1;padding:10px 18px;border-radius:10px;border:2px solid #6366f1;background:#6366f1;color:#fff;font-weight:600;cursor:pointer;font-size:13px">🖼️ Permanent</button>
+    <button id="mode-2view" onclick="selectMode('2view')" style="flex:1;padding:10px 18px;border-radius:10px;border:2px solid #334155;background:transparent;color:#94a3b8;font-weight:600;cursor:pointer;font-size:13px">🔒 2-View</button>
+  </div>
+  <div id="mode-desc" style="font-size:12px;color:#64748b;text-align:center;max-width:280px">Stays in chat permanently. Anyone can view anytime.</div>
+
+  <!-- Caption -->
+  <input id="preview-caption" type="text" placeholder="Add a caption… (optional)" maxlength="200"
+    style="width:100%;max-width:340px;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:10px 14px;color:#f1f5f9;font-size:14px;outline:none"/>
+
+  <!-- Sending progress -->
+  <div id="preview-progress" style="display:none;color:#818cf8;font-size:13px;text-align:center">
+    <div style="margin-bottom:6px">Sending…</div>
+    <div style="width:200px;height:4px;background:#1e293b;border-radius:2px;overflow:hidden">
+      <div id="progress-bar" style="height:100%;background:#6366f1;width:0%;transition:width .3s;border-radius:2px"></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div style="display:flex;gap:10px;width:100%;max-width:340px" id="preview-actions">
+    <button onclick="cancelMediaPreview()" style="flex:1;padding:11px;border-radius:10px;border:1px solid #334155;background:none;color:#94a3b8;cursor:pointer;font-size:14px">Cancel</button>
+    <button onclick="confirmSendMedia()" style="flex:1;padding:11px;border-radius:10px;border:none;background:#6366f1;color:#fff;font-weight:600;cursor:pointer;font-size:14px">Send →</button>
+  </div>
 </div>
 
 <script>
@@ -894,41 +927,99 @@ async function saveProfile() {
 
 // ══ MEDIA ══
 let pendingMediaType = null;
-let pendingMediaMode = null;
+let pendingMediaMode = "permanent";
+let pendingFileData = null;
 
 function toggleMediaMenu() {
-  const menu = document.getElementById("media-menu");
-  menu.classList.toggle("open");
+  document.getElementById("media-menu").classList.toggle("open");
 }
 
-function pickMedia(type, mode) {
+function pickMedia(type) {
   document.getElementById("media-menu").classList.remove("open");
   pendingMediaType = type;
-  pendingMediaMode = mode;
-  document.getElementById("file-" + type).click();
+  const inp = document.getElementById("file-" + type);
+  inp.value = "";
+  inp.click();
 }
 
-async function onFileChosen(type) {
+function onFileChosen(type) {
   const input = document.getElementById("file-" + type);
   const file = input.files[0];
   if (!file) return;
-  input.value = "";
-  if (file.size > 8 * 1024 * 1024) { alert("File too large. Max 8MB."); return; }
+  if (file.size > 8 * 1024 * 1024) {
+    alert("File too large. Max size is 8MB.");
+    input.value = "";
+    return;
+  }
   const reader = new FileReader();
+  reader.onerror = () => alert("Failed to read file. Please try again.");
   reader.onload = (e) => {
-    const base64Full = e.target.result;
-    const mime = file.type;
-    const rawBase64 = base64Full.split(",")[1];
-    socket.emit("send_media", {
-      roomCode: currentRoom.roomCode,
-      mediaData: rawBase64,
-      mediaMime: mime,
-      mediaType: type,
-      mediaMode: pendingMediaMode,
-      caption: type === "video" ? "📹 Video" : "📷 Photo"
-    });
+    const dataUrl = e.target.result;
+    pendingFileData = { rawBase64: dataUrl.split(",")[1], mime: file.type, type };
+    showMediaPreview(dataUrl, type);
   };
   reader.readAsDataURL(file);
+}
+
+function showMediaPreview(dataUrl, type) {
+  const overlay = document.getElementById("media-preview-overlay");
+  const img = document.getElementById("preview-img");
+  const vid = document.getElementById("preview-vid");
+  img.style.display = "none"; img.src = "";
+  vid.style.display = "none"; vid.src = "";
+  document.getElementById("preview-caption").value = "";
+  document.getElementById("preview-progress").style.display = "none";
+  document.getElementById("preview-actions").style.display = "flex";
+  document.getElementById("progress-bar").style.width = "0%";
+  if (type === "video") { vid.src = dataUrl; vid.style.display = "block"; }
+  else { img.src = dataUrl; img.style.display = "block"; }
+  pendingMediaMode = "permanent";
+  selectMode("permanent");
+  overlay.style.display = "flex";
+}
+
+function selectMode(mode) {
+  pendingMediaMode = mode;
+  const btnP = document.getElementById("mode-permanent");
+  const btn2 = document.getElementById("mode-2view");
+  const desc = document.getElementById("mode-desc");
+  const on  = "flex:1;padding:10px 18px;border-radius:10px;border:2px solid #6366f1;background:#6366f1;color:#fff;font-weight:600;cursor:pointer;font-size:13px";
+  const off = "flex:1;padding:10px 18px;border-radius:10px;border:2px solid #334155;background:transparent;color:#94a3b8;font-weight:600;cursor:pointer;font-size:13px";
+  if (mode === "permanent") {
+    btnP.style.cssText = on; btn2.style.cssText = off;
+    desc.textContent = "Stays in chat permanently. Anyone can view anytime.";
+  } else {
+    btn2.style.cssText = on; btnP.style.cssText = off;
+    desc.textContent = "Auto-deletes for everyone after 2 people have viewed it.";
+  }
+}
+
+function cancelMediaPreview() {
+  document.getElementById("media-preview-overlay").style.display = "none";
+  pendingFileData = null;
+}
+
+function confirmSendMedia() {
+  if (!pendingFileData || !currentRoom || !socket) return;
+  const caption = document.getElementById("preview-caption").value.trim()
+    || (pendingFileData.type === "video" ? "📹 Video" : "📷 Photo");
+  document.getElementById("preview-actions").style.display = "none";
+  document.getElementById("preview-progress").style.display = "block";
+  let pct = 0;
+  const bar = document.getElementById("progress-bar");
+  const prog = setInterval(() => { pct = Math.min(pct + 12, 85); bar.style.width = pct + "%"; }, 250);
+
+  socket.emit("send_media", {
+    roomCode: currentRoom.roomCode,
+    mediaData: pendingFileData.rawBase64,
+    mediaMime: pendingFileData.mime,
+    mediaType: pendingFileData.type,
+    mediaMode: pendingMediaMode,
+    caption
+  });
+
+  // Close after short delay (socket doesn't ack by default)
+  setTimeout(() => { clearInterval(prog); bar.style.width = "100%"; setTimeout(cancelMediaPreview, 400); }, 2000);
 }
 
 async function openMedia(messageId, mediaType) {
@@ -936,18 +1027,14 @@ async function openMedia(messageId, mediaType) {
     const res = await fetch(`/api/messages/${messageId}/view`, { method: "POST" });
     const data = await res.json();
     if (!res.ok || data.expired) { alert("This media has expired and been deleted."); return; }
-
     const overlay = document.createElement("div");
     overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px";
-
     const closeBtn = document.createElement("button");
     closeBtn.textContent = "✕ Close";
     closeBtn.style.cssText = "position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px";
     closeBtn.onclick = () => document.body.removeChild(overlay);
     overlay.appendChild(closeBtn);
-
     const src = `data:${data.mediaMime};base64,${data.mediaData}`;
-
     if (data.mediaType === "video") {
       const vid = document.createElement("video");
       vid.src = src; vid.controls = true; vid.autoplay = true;
@@ -959,14 +1046,12 @@ async function openMedia(messageId, mediaType) {
       img.style.cssText = "max-width:95vw;max-height:80vh;border-radius:10px;object-fit:contain";
       overlay.appendChild(img);
     }
-
     const dlBtn = document.createElement("a");
     dlBtn.href = src;
     dlBtn.download = `media.${data.mediaMime?.split("/")[1] || "jpg"}`;
     dlBtn.textContent = "⬇️ Download";
     dlBtn.style.cssText = "color:#818cf8;font-size:14px;text-decoration:none;padding:8px 16px;background:#1e293b;border-radius:8px";
     overlay.appendChild(dlBtn);
-
     document.body.appendChild(overlay);
     overlay.addEventListener("click", e => { if (e.target === overlay) document.body.removeChild(overlay); });
   } catch { alert("Failed to load media."); }
